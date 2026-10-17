@@ -6,6 +6,12 @@ on the page are illustrative. Product source: https://github.com/stonega/repodes
 
 Production: https://repodesk-landing.pages.dev
 
+Setup status (2026-10-17): production is deployed. Git source/branch preview settings
+are configured, but automatic push triggers are awaiting repair of the existing
+Cloudflare GitHub connection. Use an explicit branch build in Cloudflare meanwhile.
+The live VPS Codex optimization proposal is waiting for the configured Reviewed
+approval; baseline checks do not represent a completed Codex task.
+
 ## Local development
 
 Use Bun 1.3.14 and Node 22.19+ (Node 24 recommended).

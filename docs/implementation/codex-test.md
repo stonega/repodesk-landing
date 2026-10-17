@@ -7,6 +7,15 @@ Baseline is tagged `baseline-v1`; record its full commit SHA before launching.
 Optimization adds a useful accessible interactive walkthrough to the existing
 illustrative conversation. The initial page remains a usable, complete website.
 
+## Current acceptance status — 2026-10-17
+
+The exact baseline passed local/CI checks and an isolated preflight in the existing
+VPS Codex job image. The live optimization proposal was delivered via the existing
+Reviewed workflow and awaits requester approval. Automatic Cloudflare push triggers
+are configured but unverified; explicitly trigger a PR branch preview until the
+operator repairs the existing GitHub connection. No completed Codex run or PR is
+claimed by the baseline verification.
+
 ## Environment
 
 - Repository: stonega/repodesk-landing, base branch main.
