@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Walkthrough from "../components/walkthrough";
 
 export const REPO_URL = "https://github.com/stonega/repodesk";
 export const DOCS_URL = `${REPO_URL}/blob/main/docs/implementation/setup.md`;
@@ -148,65 +149,7 @@ export default function Home() {
               Self-hosted. Open source. Made for repository work.
             </p>
           </div>
-          <div className="conversation-scene">
-            <div className="scene-label">
-              <span>LESS CONTEXT SWITCHING</span>
-              <span aria-hidden="true">↙</span>
-            </div>
-            <div className="chat-window">
-              <div className="chat-header">
-                <img src="/repodesk-mark.svg" width="38" height="38" alt="" />
-                <div>
-                  <strong>RepoDesk</strong>
-                  <span>Your repository, in the loop</span>
-                </div>
-                <span className="chat-dots" aria-hidden="true">
-                  ···
-                </span>
-              </div>
-              <div className="chat-body">
-                <p className="chat-date">ILLUSTRATIVE CONVERSATION</p>
-                <div className="message outgoing">
-                  The signup page feels cramped on mobile. Can you improve the
-                  spacing?<span className="message-time">10:42</span>
-                </div>
-                <div className="message incoming">
-                  <strong>RepoDesk</strong>I’ll look at the layout, improve the
-                  mobile spacing, and run the project checks.
-                  <span className="message-time">10:42</span>
-                </div>
-                <div className="task-progress">
-                  <span className="check-circle" aria-hidden="true">
-                    ✓
-                  </span>
-                  <div>
-                    <strong>Repository checks passed</strong>
-                    <span>Changes are ready for your review</span>
-                  </div>
-                </div>
-                <a className="pr-preview" href={`${REPO_URL}/pulls`}>
-                  <span className="pr-icon" aria-hidden="true">
-                    ⑂
-                  </span>
-                  <div>
-                    <span>EXAMPLE PULL REQUEST</span>
-                    <strong>Improve the mobile signup layout</strong>
-                    <small>
-                      Review the changes on GitHub{" "}
-                      <span aria-hidden="true">↗</span>
-                    </small>
-                  </div>
-                </a>
-              </div>
-              <div className="chat-compose" aria-hidden="true">
-                A little less back-and-forth.<span>↗</span>
-              </div>
-            </div>
-            <div className="scene-footnote">
-              <span className="tiny-line" /> From an idea to something you can
-              review.
-            </div>
-          </div>
+          <Walkthrough />
         </section>
         <div className="integration-strip wrap">
           <span>THE TOOLS YOU ALREADY WORK IN</span>

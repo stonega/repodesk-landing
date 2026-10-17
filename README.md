@@ -34,7 +34,10 @@ bun run test:browser
 React Router v7 prerenders the page into `build/client`. Tailwind v4 provides the
 CSS entry point, with page-specific design tokens and styles; no UI kit is needed.
 Biome handles formatting and lint. Unit tests render the real page; Playwright checks
-mobile/desktop navigation, overflow, disclosures, setup destinations and reduced motion.
+mobile/desktop navigation, overflow, disclosures, setup destinations, reduced motion
+and the accessible Code Q&A / Fix an issue / PR review example tabs. The walkthrough
+contains sample outcomes only, not live task results. See [page guidance](docs/user/landing.md)
+for keyboard controls.
 
 ## Deployment and plugin testing
 
