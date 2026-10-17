@@ -38,6 +38,11 @@ summary:focus-visible {
   outline-offset: 5px;
   border-radius: 4px;
 }
+.scenario-panel:focus-visible {
+  outline: 3px solid #39765d;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 .wrap {
   width: min(1160px, calc(100% - 96px));
   margin-inline: auto;
@@ -166,6 +171,7 @@ h1 em {
 }
 .conversation-scene {
   position: relative;
+  min-width: 0;
   padding: 26px 0 28px;
 }
 .scene-label {
@@ -184,7 +190,6 @@ h1 em {
   border: 1px solid #ccd6c6;
   border-radius: 12px;
   background: #fff;
-  transform: rotate(-2deg);
   box-shadow: 0 12px 34px #203a3208;
   overflow: hidden;
 }
@@ -208,6 +213,51 @@ h1 em {
 .chat-dots {
   margin-left: auto;
   font-size: 24px;
+}
+.scenario-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px;
+}
+.scenario-tabs button {
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 1px solid #cbd4c1;
+  border-radius: 5px;
+  background: transparent;
+  color: #244b3b;
+  font-size: 12px;
+  cursor: pointer;
+}
+.scenario-tabs button[aria-selected="true"] {
+  background: #244b3b;
+  border-color: #244b3b;
+  color: #fff;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.scenario-tabs button:focus-visible {
+  outline-offset: 2px;
+}
+.scenario-panels {
+  display: grid;
+}
+.scenario-panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.scenario-panel[aria-hidden="true"] {
+  visibility: hidden;
+}
+.example-notice {
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+  color: #52634c;
+  margin: 0 0 18px;
 }
 .chat-body {
   background: #eef1e8;
@@ -244,12 +294,6 @@ h1 em {
   background: #fff;
   border-bottom-left-radius: 2px;
 }
-.message-time {
-  display: block;
-  text-align: right;
-  font-size: 8px;
-  color: #77846f;
-}
 .task-progress {
   display: flex;
   gap: 10px;
@@ -284,9 +328,6 @@ h1 em {
   background: #fff;
   border-radius: 7px;
   border: 1px solid #d6dece;
-}
-.pr-preview:hover {
-  border-color: #749064;
 }
 .pr-icon {
   color: #647b4a;
@@ -635,9 +676,6 @@ details p {
     width: min(420px, 100%);
     margin-inline: auto;
     padding-inline: 6px;
-  }
-  .chat-window {
-    transform: rotate(-1deg);
   }
   .scene-label {
     font-size: 8px;
