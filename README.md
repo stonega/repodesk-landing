@@ -6,11 +6,15 @@ on the page are illustrative. Product source: https://github.com/stonega/repodes
 
 Production: https://repodesk-landing.pages.dev
 
-Setup status (2026-10-17): production is deployed. Git source/branch preview settings
-are configured, but automatic push triggers are awaiting repair of the existing
-Cloudflare GitHub connection. Use an explicit branch build in Cloudflare meanwhile.
-The live VPS Codex optimization proposal is waiting for the configured Reviewed
-approval; baseline checks do not represent a completed Codex task.
+Acceptance status (2026-10-17): production is deployed. The real VPS Docker Codex
+task completed after requester approval and produced [PR #2](https://github.com/stonega/repodesk-landing/pull/2).
+Verify and native Cloudflare Pages checks passed; its automatic preview is
+https://51612f60.repodesk-landing.pages.dev. The PR remains open for review.
+An isolated OpenSandbox repeat also passed and produced
+[PR #3](https://github.com/stonega/repodesk-landing/pull/3), with passing CI and
+preview https://36cfc077.repodesk-landing.pages.dev.
+The fixed `baseline-v1` is unchanged. See the test protocol for separate sandbox
+results and their limits.
 
 ## Local development
 

@@ -1,14 +1,16 @@
 # Setup
 
-## Current deployment gate — 2026-10-17
+## Verified deployment — 2026-10-17
 
-Production has deployed successfully from Git through an explicit Pages API trigger.
-Automatic branch pushes have not triggered builds yet. Git source and preview
-settings are configured, but the existing Cloudflare GitHub connection needs operator
-inspection/reconnection. Its repository-selection API update returned 403.
-Until automatic triggers are verified, explicitly deploy the desired branch through
-the Cloudflare dashboard. Do not assume a push or merge updates the public page.
-
+Production deployed through an explicit Git-backed Pages API trigger. The real
+Docker Codex PR later verified automatic Git integration: head
+`28f1acfef7df5074fb8fcb542e074ff6f8858f78` produced a successful `github:push`
+deployment at https://51612f60.repodesk-landing.pages.dev and a passing native Pages
+check. This resolves the initial automatic-preview gate. Earlier connection flags
+and CLI permission failures did not establish the exact recovery cause.
+The later OpenSandbox PR also passed the native Pages check, deploying head
+`d5108b97a0f04a91d3cb7ce636a4352d33697e5d` to
+https://36cfc077.repodesk-landing.pages.dev.
 
 Run the commands in README.md. Keep bun.lock committed and use frozen installs.
 `bun run verify` is the credential-free verification command for Codex runners.
