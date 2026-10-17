@@ -6,7 +6,7 @@ crawlable HTML without a runtime server. Cloudflare Pages serves `build/client`.
 There is no backend, visitor database, analytics tracker, or account flow.
 
 The baseline is a complete landing page: responsive navigation, product introduction,
-a labeled illustrative Telegram conversation, three workflow steps, permission and
+a labeled three-scenario Telegram walkthrough, three workflow steps, permission and
 review boundaries, native FAQ disclosures, and setup/source links. Keep product
 claims aligned with RepoDesk's implementation evidence; do not invent adoption data.
 
@@ -25,6 +25,20 @@ from stonega/repodesk/web/assets/repodesk-mark.svg.
 - Reduced motion removes smooth scrolling. No remote fonts or oversized raster images.
 
 ## Test boundaries
+
+The walkthrough is a local React component with no new dependencies or remote
+requests. It uses automatically activated ARIA tabs with roving keyboard focus,
+linked and labeled panels, and Code Q&A selected in the prerendered HTML. All
+panels share one CSS grid cell to reserve the longest panel’s height at the current
+viewport width. Inactive panels are invisible, aria-hidden and inert, excluding
+them from the accessibility tree and keyboard navigation without layout shifts.
+No switching animation or live task status is shown.
+
+Component tests check prerendered relationships, defaults and example labels.
+Browser tests cover pointer/touch selection, arrow wrapping, Home/End, focus order,
+visible focus, panel accessibility, stable layout and overflow at 1440px and 390px,
+plus a 320px narrow check and reduced-motion interaction. Existing navigation,
+setup-link and FAQ acceptance checks remain in place.
 
 Unit and browser checks are deterministic and call no model, Telegram or GitHub APIs.
 CI and Pages previews validate a proposed change; neither represents a successful

@@ -38,6 +38,11 @@ summary:focus-visible {
   outline-offset: 5px;
   border-radius: 4px;
 }
+.scenario-panel:focus-visible {
+  outline: 3px solid #39765d;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 .wrap {
   width: min(1160px, calc(100% - 96px));
   margin-inline: auto;
@@ -180,6 +185,28 @@ h1 em {
   font-size: 22px;
   line-height: 10px;
 }
+.scenario-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.scenario-tabs button {
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 1px solid #ccd6c6;
+  border-radius: 5px;
+  background: #fff;
+  color: #244b3b;
+  font-size: 12px;
+  cursor: pointer;
+}
+.scenario-tabs button[aria-selected="true"] {
+  background: #244b3b;
+  border-color: #244b3b;
+  color: #fff;
+  font-weight: 650;
+}
 .chat-window {
   border: 1px solid #ccd6c6;
   border-radius: 12px;
@@ -218,7 +245,24 @@ h1 em {
   font-size: 8px;
   letter-spacing: 1.2px;
   color: #78816e;
+  margin-bottom: 6px;
+}
+.chat-disclaimer {
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+  color: #56634e;
   margin-bottom: 18px;
+}
+.scenario-panels {
+  display: grid;
+}
+.scenario-panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.scenario-panel[aria-hidden="true"] {
+  visibility: hidden;
 }
 .message {
   font-size: 12px;
@@ -244,69 +288,28 @@ h1 em {
   background: #fff;
   border-bottom-left-radius: 2px;
 }
-.message-time {
-  display: block;
-  text-align: right;
-  font-size: 8px;
-  color: #77846f;
-}
-.task-progress {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin: 20px 2px 15px;
-}
-.check-circle {
-  font-size: 10px;
-  width: 20px;
-  height: 20px;
-  color: #fff;
-  background: #618452;
-  border-radius: 100%;
-  display: grid;
-  place-items: center;
-}
-.task-progress strong,
-.task-progress div > span {
-  display: block;
-  font-size: 10px;
-}
-.task-progress div > span {
-  color: #78806f;
-  font-size: 9px;
-  margin-top: 3px;
-}
-.pr-preview {
-  display: flex;
-  gap: 13px;
-  align-items: center;
+.scenario-result {
   padding: 16px 14px;
   background: #fff;
   border-radius: 7px;
   border: 1px solid #d6dece;
 }
-.pr-preview:hover {
-  border-color: #749064;
+.scenario-result p {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #56634e;
+  margin-bottom: 0;
 }
-.pr-icon {
-  color: #647b4a;
-  font-size: 25px;
-}
-.pr-preview div > span {
-  font-size: 7px;
+.scenario-result .result-label {
+  font-size: 8px;
   letter-spacing: 1px;
-  color: #7c8573;
 }
-.pr-preview strong {
-  display: block;
+.scenario-result h2 {
   font-size: 11px;
-  margin-top: 3px;
-}
-.pr-preview small {
-  display: block;
-  font-size: 9px;
-  color: #60764b;
-  margin-top: 7px;
+  line-height: 1.5;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+  margin-block: 4px 7px;
 }
 .chat-compose {
   padding: 15px 20px;
