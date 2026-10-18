@@ -72,10 +72,13 @@ summary:focus-visible {
 .nav a {
   padding-block: 14px;
 }
-.nav-github {
+.github-link {
   display: inline-flex;
   align-items: center;
   gap: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  padding-block: 14px;
 }
 .menu-button {
   display: none;
@@ -569,12 +572,12 @@ details p {
   gap: 25px;
   font-size: 10px;
 }
-.site-footer > div a {
+.site-footer > div a:not(.github-link) {
   display: flex;
   gap: 6px;
   align-items: center;
 }
-.site-footer svg {
+.site-footer a:not(.github-link) svg {
   width: 12px;
   height: 12px;
 }

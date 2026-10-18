@@ -1,5 +1,78 @@
 import { expect, test } from "@playwright/test";
 
+test("header and footer GitHub links share their icon, styling and keyboard focus", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  if (info.project.name === "mobile") {
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+  }
+  const navigation = page.getByRole("navigation", { name: "Main navigation" });
+  const link = navigation.getByRole("link", { name: "GitHub", exact: true });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute(
+    "href",
+    "https://github.com/stonega/repodesk",
+  );
+  const icon = link.locator("svg");
+  await expect(icon).toBeVisible();
+  await expect(icon).toHaveAttribute("aria-hidden", "true");
+  await expect(icon).toHaveAttribute("focusable", "false");
+  await expect(icon).toHaveAttribute("fill", "currentColor");
+  await navigation.getByRole("link", { name: "Built for your team" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(link).toBeFocused();
+  expect(
+    await link.evaluate((element) => getComputedStyle(element).outlineStyle),
+  ).toBe("solid");
+  const footer = page.getByRole("contentinfo");
+  const footerLink = footer.getByRole("link", { name: "GitHub", exact: true });
+  await expect(footerLink).toBeVisible();
+  await expect(footerLink).toHaveAttribute(
+    "href",
+    "https://github.com/stonega/repodesk",
+  );
+  await expect(
+    footer.getByRole("link", { name: "Source", exact: true }),
+  ).toHaveCount(0);
+  await expect(footerLink.locator("svg")).toHaveAttribute(
+    "aria-hidden",
+    "true",
+  );
+  await expect(footerLink.locator("svg")).toHaveAttribute("focusable", "false");
+  expect(await footerLink.innerHTML()).toBe(await link.innerHTML());
+  const styles = await page.locator(".github-link").evaluateAll((elements) =>
+    elements.map((element) => {
+      const style = getComputedStyle(element);
+      const icon = element.querySelector("svg");
+      return {
+        display: style.display,
+        gap: style.gap,
+        fontSize: style.fontSize,
+        fontWeight: style.fontWeight,
+        color: style.color,
+        paddingBlock: style.paddingBlock,
+        iconWidth: icon?.getBoundingClientRect().width,
+        iconHeight: icon?.getBoundingClientRect().height,
+      };
+    }),
+  );
+  expect(styles).toHaveLength(2);
+  expect(styles[0]).toEqual(styles[1]);
+  await footer.getByRole("link", { name: "RepoDesk home" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(footerLink).toBeFocused();
+  expect(
+    await footerLink.evaluate(
+      (element) => getComputedStyle(element).outlineStyle,
+    ),
+  ).toBe("solid");
+  await page.keyboard.press("Tab");
+  await expect(
+    footer.getByRole("link", { name: "Documentation", exact: true }),
+  ).toBeFocused();
+});
+
 test("renders a responsive page and working setup links", async ({
   page,
 }, info) => {
