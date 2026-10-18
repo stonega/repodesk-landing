@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Walkthrough from "../components/walkthrough";
 
 export const REPO_URL = "https://github.com/stonega/repodesk";
-export const DOCS_URL = `${REPO_URL}/blob/main/docs/implementation/setup.md`;
+export const DOCS_URL = "/docs/implementation/setup";
 export function meta() {
   return [
     { title: "RepoDesk — Your repositories, one conversation away." },
@@ -138,6 +138,7 @@ export default function Home() {
         >
           <a href="#workflow">How it works</a>
           <a href="#principles">Built for your team</a>
+          <a href="/docs">Docs</a>
           <GitHubLink />
         </nav>
       </header>
@@ -315,7 +316,7 @@ export default function Home() {
         <p>From conversation to contribution.</p>
         <div>
           <GitHubLink />
-          <a href={`${REPO_URL}/blob/main/docs/README.md`}>
+          <a href="/docs">
             Documentation <Arrow diagonal />
           </a>
         </div>

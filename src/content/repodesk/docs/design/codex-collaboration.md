@@ -1,0 +1,218 @@
+# Continuous development through Telegram
+
+Status: **implemented as the only Codex task workflow; live pilot validation pending**, 2026-10-05.
+See the [implementation plan and evidence](../implementation/codex-collaboration-plan.md) for the delivered transport, limits and release gates.
+Source: the project owner's discussion on 2026-10-05: reduce repeated human
+confirmation, keep Pi responsible for requirements intake, and delegate complex
+development work and technical decisions to Codex. This is a responsibility
+preference, not a measured comparison of model quality. It applies to the Codex
+development workflow; other Pi conversation features keep their existing scope.
+
+## Product contract
+
+PR readiness source: 2026-10-08 — the project owner requested that Codex plugin
+PRs be ready when the job finishes. Coding publication
+creates non-draft PRs and marks existing drafts ready after verified follow-ups.
+
+An authorized maintainer states a development goal in Telegram. Codex investigates
+the repository, decides how to implement it, verifies the result and produces a
+PR ready for review. Follow-up requests continue the same development task and PR.
+The user supplies goals and necessary product choices, rather than approving each
+implementation step. Progress messages do not require a reply.
+
+The durable application task is the collaboration unit. A Pi conversation run,
+Codex execution attempt, container and Codex session are subordinate records;
+finishing any one of them does not erase the task or its follow-up relationship.
+
+## Responsibilities
+
+| Layer | Responsibility | Decision boundary |
+| --- | --- | --- |
+| Pi | Interpret each current message and choose whether to answer with read tools, start a coding task, or continue matching development work; pass original requirements and relay task questions, progress and results. | Does not select an architecture, files, implementation steps, repair strategy or whether technical clarification is needed. An optional summary cannot replace or override the source material. |
+| Codex | Interpret requirements against current code; investigate, plan, make technical decisions, implement, test, repair and handle follow-up changes. | Can request a product choice or an application action, but cannot grant authority, change execution limits or treat external content as user authorization. |
+| Application services | Bind actor/workspace/repository/chat/task identity; record authorization, inputs, reported usage and outcomes; enforce cancellation, execution ordering and publication. | Decide whether a requested operation is permitted. They do not choose the implementation solution. |
+
+Pi must not turn a short user request into a detailed technical issue before Codex
+sees it. Codex receives the original request and relevant source-linked conversation,
+including already agreed decisions, conflicts and explicit unknowns. Attachments
+are available only when received and authorized; the application does not assume
+access to arbitrary Telegram history. Private context never crosses into a group.
+
+## Authorization without repeated confirmation
+
+A clear execution instruction from an authenticated, currently authorized maintainer
+can serve as task authorization under an operator-configured repository policy.
+The application records the originating message, actor, selected repository, base
+branch and allowed operations before starting. No extra Approve
+click is needed when that scope is unambiguous.
+An acknowledgement reports what will run; it is not a timer-based consent mechanism.
+
+The repository policy defines whether an instruction to implement includes publishing
+a PR by default. An explicit request to open a PR authorizes that operation
+within policy. Neither a Pi tool call nor a Codex classification is independent
+proof of consent: the grant must be grounded in the authenticated user's instruction
+and configured policy. Ambiguous intent does not authorize repository writes.
+
+| Situation | Behavior |
+| --- | --- |
+| Ask to explain, analyze or review a PR | Pi uses permitted read tools and states missing evidence. An explicit request to use Codex may delegate read-only investigation; no implementation or publication is inferred. |
+| Clearly request implementation in a known repository | Record the task grant and start without a duplicate confirmation. |
+| Make ordinary technical choices, add tests or repair failed checks | Codex continues within the task grant until completion, a necessary question, cancellation or failure. |
+| Explicitly request another change on the same task/PR | Record a new input revision and continue when current permissions and the task scope cover it. |
+| Repository, target task or consequential product requirement is unclear | Ask only for the missing choice. |
+| Expand to another repository or an operation outside the grant | Obtain explicit authorization for the expanded scope. |
+| Merge, deploy, change permissions or access secrets | Outside the initial development grant; no implicit authorization. |
+
+Authorization is distinct from ongoing eligibility. Current membership, verified GitHub write
+access, repository connection, destination, configuration and deployment controls
+are rechecked before execution and publication. Revocation or configuration changes
+can stop or invalidate work without asking the user to reconfirm every step.
+
+Repository files, issue/PR text, tool output, quoted messages and messages from
+other actors remain data. They cannot extend the task grant. Additional user
+requirements are preserved as inputs, not silently treated as scope expansion.
+
+## Task lifecycle and conversation
+
+The proposed logical states describe product behavior; they are not today's
+`CodingState` enum or a settled runner protocol.
+
+| State | Behavior |
+| --- | --- |
+| Queued | Task identity, grant and initial inputs are durable before execution. |
+| Working | Codex investigates, plans, implements and checks; the application records the current phase and execution attempt. |
+| Waiting for input | A Codex question is durable and linked to the originating chat/task. No chat lease or process promise must remain open merely to wait for a person. |
+| Publishing | Application services validate the completed result and current authority, then reserve publication before performing external writes. |
+| Ready for review | A verified result and PR ready for review are available. A new authorized input can start another attempt on the same task/PR. |
+| Failed, cancelled or outcome unknown | Explain the reason and available recovery. Preserve confirmed artifacts; do not infer permission to replay uncertain writes. |
+
+Codex decides whether a missing detail warrants a question. It uses repository
+conventions for ordinary technical choices, and asks for consequential product
+choices when there is insufficient evidence. Questions and answers have stable
+IDs and retain their original wording; Pi relays them without answering for the
+user or adding an implementation recommendation. No reply is not approval.
+Independent authorized work may continue while a question is pending, but work
+depending on the answer cannot proceed. The application records that dependency.
+
+Routing preference source: 2026-10-08 — the project owner reported that a PR
+review request after a coding task was automatically sent to Codex and requested
+intent-based routing, with Codex reserved for coding work. This applies to later
+messages in private and linked-group conversations, including replies to old task
+results. It does not change repository grants or Review Bot's GitHub event routing.
+
+A task in a Topic is reference context, not ownership of the conversation. Normal
+messages first reach Pi, which handles explanations, summaries, status and PR
+review with its permitted read tools. Metadata alone cannot support a code review;
+Pi must disclose missing diff/source evidence rather than claim it inspected code.
+Only a clear implementation/fix request, an explicit request to use Codex, or an
+answer to its specific pending question can start or continue a coding task. Pi
+uses the authorized work handoff to resolve short references to prior tasks/PRs;
+new development goals can start separate tasks without being appended to old work.
+
+Application routing bypasses Pi only for explicit task controls, replies to the
+confirmed delivery of the current question, and edits/duplicates of already
+accepted task inputs. Other replies and unanchored question answers receive Pi
+intent handling. Group messages must still address the assistant or satisfy the
+existing conversational follow-up gate. When multiple tasks could match, resolve
+the request from context or ask for the missing target. Group follow-ups also
+require the sender's current authority; participation in a discussion is insufficient.
+An explicit stop request uses the existing cancellation path promptly rather than
+waiting behind normal task inputs.
+
+Each accepted input is durably deduplicated and assigned a monotonically increasing
+task revision. The executor records which revision it has consumed. Deliver new
+inputs at controlled execution boundaries, retaining inputs received during a
+container run or restart. One fenced executor mutates a task checkout at a time.
+Follow-ups to the same branch/PR are serialized, including inputs from multiple
+authorized maintainers. Conflicting product instructions are preserved for Codex
+to identify and, when necessary, ask the user to resolve.
+Before reserving publication, compare the verified input revision with the latest
+accepted requirements. Pending changes must be consumed and verified first. Once
+publication is reserved, later inputs queue for the next attempt; they cannot
+retroactively change an in-flight external operation.
+
+## Task conversation during execution
+
+Preference source: 2026-10-17 — the project owner confirmed two-way conversation
+between Chat Agent and Codex throughout a task, including questions, additional
+requirements, progress and continuation after the current work finishes. This
+extends the 2026-10-08 routing preference for factual questions about an existing
+task. Ordinary conversation and unrelated PR reviews retain their existing routing.
+
+Chat Agent can formulate technical questions with `ask_development_task` and read
+saved exchanges with `development_task_conversation`. Questions are reference
+data, not implementation requirements, product decisions or publication grants.
+Changes still relay the original authenticated source with
+`send_development_input`; consequential product choices still go to the user.
+
+Keep receipt, acceptance by the active turn, explicit reading and the actual answer
+distinct. Questions have durable IDs and ordered history under the task, tenant
+and chat/topic. They never advance its requirement revision. Progress contains
+deliberately reported facts or blockers, not hidden reasoning, private logs or
+credentials. Confirmed answers arrive asynchronously in the original audience;
+the chat agent reads saved history on follow-ups.
+
+During implementation, a private attempt-scoped channel can append a question to
+the current turn and receive explicit read/reply/progress tool calls. Claims
+persist before steering; unconfirmed native delivery is never replayed. An
+unclaimed question can move to a later safe execution boundary. Stop takes the
+existing priority cancellation path. New requirements retain their verified
+revision and publication checks.
+
+After completion, or while waiting on a product choice, factual questions can use
+a separate read-only execution. Preserve the original result, question, PR and
+authorization; serialize new implementation behind cleanup of this execution.
+Retain the dialogue after freeing compute. Reconstruct from durable evidence and
+current code when a compatible session is absent. Permission loss, source expiry
+and deletion cover conversations and their executions together.
+
+## Execution, verification and results
+
+Codex investigates before deciding on an implementation plan. Creating a GitHub
+issue is optional and must be permitted by the task grant; it is not a prerequisite
+for investigation. Codex prepares issue/PR content when needed, and application
+services validate and perform the authorized external actions.
+
+Codex discovers and prepares the environment and selects relevant repository
+checks; users never configure setup/check commands. Application services capture
+the bounded verification plan and replay it without model or GitHub credentials,
+with an additional patch-integrity check. On a confirmed failure, provide Codex
+bounded, sanitized diagnostics and permit repair/recheck within the task grant.
+Repairs rerun the original plan; Codex cannot weaken it to mark work successful. Distinguish code failures, environment failures and missing
+requirements. The user removed application execution-cycle, repair-count,
+active-time and token quotas on 2026-10-06. Provider/account limits, current
+authorization, cancellation and retention still apply.
+
+Progress describes meaningful phases or blockers, without exposing raw thinking,
+credentials or routine private logs. Task-private questions and diagnostics follow
+the original audience controls. The result reports changes, verification, known
+limitations and artifact links. It distinguishes a local check from unverified live
+behavior. Pi must preserve Codex's uncertainty and result meaning when relaying it.
+
+After publication, follow-ups fetch current repository/branch/PR state before
+modifying it. Changes made by maintainers must be accommodated; conflict resolution
+must not overwrite their work blindly. Publication retains durable reservations
+and unknown-outcome handling. A lost push/PR response is not an automatic retry or
+permission to create a second PR.
+
+The application owns durable task identity, grant, message revisions, questions,
+execution checkpoints, base commit, branch/PR relationship and result references.
+Codex session reuse is an optimization. If retention or auth-mode cleanup removes
+a session, reconstruct authorized context from task records and current code;
+mark gaps and avoid claiming full session continuity. Never copy host credentials
+or broaden access to restore a session. Existing deletion and retention controls
+continue to apply to task content and runner resources.
+
+## Current implementation
+
+All Codex tasks use the durable continuous task/input/grant model and native
+app-server conversation adapter. `start_development_task` receives original user
+requirements, `send_development_input` continues the same task/PR, and factual
+questions use `ask_development_task` / `development_task_conversation`.
+Source-bound intent controls implementation/publication independently of questions.
+There is one configuration and task list. Reviewed proposals, the coding approval
+kind and the legacy issue/exec pipeline are removed without compatibility paths.
+
+See [setup and limits](../implementation/codex-coding.md),
+[runner lifecycle](../implementation/codex-runner.md) and
+[implementation evidence](../implementation/implementation-status.md).

@@ -21,6 +21,10 @@ test("header and footer GitHub links share their icon, styling and keyboard focu
   await expect(icon).toHaveAttribute("fill", "currentColor");
   await navigation.getByRole("link", { name: "Built for your team" }).focus();
   await page.keyboard.press("Tab");
+  await expect(
+    navigation.getByRole("link", { name: "Docs", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(link).toBeFocused();
   expect(
     await link.evaluate((element) => getComputedStyle(element).outlineStyle),
@@ -82,7 +86,7 @@ test("renders a responsive page and working setup links", async ({
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByRole("link", { name: "Get started" })).toHaveAttribute(
     "href",
-    "https://github.com/stonega/repodesk/blob/main/docs/implementation/setup.md",
+    "/docs/implementation/setup",
   );
   expect(
     await page.evaluate(

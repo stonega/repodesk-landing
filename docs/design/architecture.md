@@ -5,6 +5,11 @@ strict mode, Tailwind CSS v4, Bun and Biome. `ssr: false` with prerendering emit
 crawlable HTML without a runtime server. Cloudflare Pages serves `build/client`.
 There is no backend, visitor database, analytics tracker, or account flow.
 
+The same application also serves `/docs` and static document routes from a pinned,
+unchanged snapshot of stonega/repodesk. The original index, research/proposal labels
+and source attribution are preserved. See [documentation maintenance](../implementation/documentation.md)
+for provenance, rendering dependencies, refresh commands and acceptance coverage.
+
 The baseline is a complete landing page: responsive navigation, product introduction,
 a labeled three-scenario Telegram walkthrough, three workflow steps, permission and
 review boundaries, native FAQ disclosures, and setup/source links. Keep product

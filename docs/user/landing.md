@@ -4,6 +4,21 @@ Get started opens the RepoDesk self-hosting guide. Source opens the product repo
 How it works jumps to the workflow. The mobile menu closes after selecting a section.
 FAQ rows open with click, Enter or Space.
 
+## Documentation
+
+Docs in the header and Documentation in the footer open `/docs`. Get started and
+Set up RepoDesk open the mirrored setup guide. The original product documentation
+is shown directly, with its upstream repository and pinned source revision above
+each page. Research and proposed work are not claims of shipped functionality.
+
+Use the documentation sidebar on desktop. On mobile, open Browse documentation
+with click, Enter or Space, then choose a page. The current page is highlighted and
+announced. Skip to content moves focus past navigation; overflowing tables and code samples are
+keyboard-focusable and scroll horizontally without widening the page. Section
+links, direct document URLs and browser Back work without a backend. Home returns
+to the landing page. The snapshot updates only when maintainers explicitly refresh
+it; View source opens the exact upstream version being displayed.
+
 ## Example walkthrough
 
 The Telegram-style preview offers Code Q&A, Fix an issue (the default), and PR review.

@@ -15,6 +15,9 @@ https://36cfc077.repodesk-landing.pages.dev.
 Run the commands in README.md. Keep bun.lock committed and use frozen installs.
 `bun run verify` is the credential-free verification command for Codex runners.
 Browser acceptance is separate because it requires the Playwright Chromium binary.
+The build also prerenders every product documentation route from the checked-in
+snapshot; normal verification does not fetch product content. See
+[documentation maintenance](documentation.md) for the explicit refresh workflow.
 
 ## Cloudflare Pages
 

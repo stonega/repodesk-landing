@@ -39,6 +39,23 @@ and the accessible Code Q&A / Fix an issue / PR review example tabs. The walkthr
 contains sample outcomes only, not live task results. See [page guidance](docs/user/landing.md)
 for keyboard controls.
 
+## Product documentation
+
+`/docs` renders the original product documentation from **stonega/repodesk** inside
+this landing application. Every Markdown document under its `docs/` directory,
+plus the assistant personality linked from the index, is checked in unchanged at a
+pinned commit. Relative documentation links stay on the site; source files and
+other repository links open that same upstream revision. Design proposals and
+research remain labeled as such; mirroring them is not a new product claim.
+
+Builds and tests use the local snapshot and need no GitHub credentials or live API.
+See [documentation maintenance](docs/implementation/documentation.md) to refresh
+the snapshot and verify its 43 prerendered pages.
+
+To preview the built site, run `bun run build && bun run preview`. The local
+static preview serves prerendered directory indexes at both `/docs` and `/docs/`,
+including deep pages. It is development/test tooling, not a production server.
+
 ## Deployment and plugin testing
 
 Cloudflare Pages connects directly to this repository: main is production, other

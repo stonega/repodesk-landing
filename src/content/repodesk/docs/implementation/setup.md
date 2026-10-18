@@ -1,0 +1,589 @@
+# Local setup and Docker
+
+The local pilot implementation includes the Telegram transport, Pi worker,
+PostgreSQL persistence, and admin SPA. No accounts are connected by installation.
+See [implementation status](implementation-status.md) for tested scope and launch gates.
+
+## Start the local stack
+
+Requires Docker Compose, Bun 1.3.14 and Node 24 for host development.
+
+```sh
+bun install --frozen-lockfile
+bun install --cwd services/code-truth --frozen-lockfile
+cp .env.example .env
+mkdir -p secrets
+openssl rand -hex 32 > secrets/encryption-key
+```
+
+Set `POSTGRES_PASSWORD` in `.env` to a unique URL-safe password. Keep `.env`,
+`secrets/` and backups out of Git. Compose injects the encryption key as a runtime
+secret. The database is private; the app listens on loopback only.
+
+```sh
+docker compose config --quiet
+docker compose up --build -d
+```
+
+For subsequent local Docker starts, run `bun run local:start`. It validates the
+Compose files selected in `.env` before starting them. Pass `--build` to rebuild Compose images after source changes
+(`bun run local:start --build`). The separate Codex job image is built as described
+in [the local runner guide](codex-runner.md). The default reuses local images for a
+quick restart.
+
+Open `http://localhost:3000/setup`. Create the first administrator with a username
+and a password of at least 12 characters. No bootstrap token or host command is
+needed. Concurrent requests cannot create two initial admins, and setup cannot be
+claimed again after account creation. There is no default password. Setup progress
+persists in PostgreSQL. Complete first setup before exposing a fresh deployment
+beyond localhost: the first successful submission establishes its administrator.
+See [the setup API example](../../examples/setup.http) for the equivalent request.
+
+The authenticated setup wizard guides you through Workspace, Model, Telegram bot
+and GitHub App. Model adds an OpenAI-compatible provider with a base URL and API key,
+fetches its `/models` list on save, and lets you select a bot chat model. Providers
+are shared across your workspaces; each workspace and service saves its own choice. Create the workspace with a name and timezone;
+**Continue to Telegram** saves it and keeps you on Workspace if validation fails.
+The timezone selector starts with your browser's IANA timezone and also offers UTC
+and other available IANA zones.
+Adjust budgets and retention later in the Overview team editor. You can revisit steps.
+The GitHub step has one **Connect GitHub** button. It creates a personal App when
+needed, then continues directly to GitHub user authorization and installation
+without an icon download or upload step. Choose the
+repositories in GitHub. Setup verifies one accessible installation, connects its
+granted repositories and opens the workspace directly without a welcome modal. If more
+than one installation is accessible, use Plugins to choose the right account.
+Selecting **All repositories** in GitHub connects all repositories currently
+accessible to the authorizing user through that installation. Successful model
+setup activates the bot automatically once the Telegram receiver and an enabled
+published skill are ready. If Telegram connects later, activation finishes
+automatically; there is no activation step in **Model settings**.
+The Deployment sidebar hides **Setup** once the server reports the deployment
+as active, including while paused. Inactive deployments retain the entry to resume
+setup; it stays absent while the activation state is unknown. Navigation rechecks
+that state, including when leaving the wizard. **New** in the workspace dropdown
+and direct `/setup` links remain available.
+Bot and model credentials are write-only and encrypted
+with AES-256-GCM; the database does not contain the runtime encryption key.
+
+`GET /healthz` reports process liveness. `GET /readyz` also requires a recent
+worker heartbeat. `/admin/*` deep links load the SPA; `/api/*` failures remain JSON.
+
+The web pages show the application version at the bottom right on desktop.
+Mobile admin pages keep it in the header beside the navigation menu; mobile
+sign-in and setup use a normal-flow footer. The menu opens a scrollable left-side
+sheet; close it with the X, Escape, a backdrop tap, or a navigation selection.
+The build reads
+it from `package.json`; update its `version` when preparing a release and rebuild
+the assets or Docker image to display the new version.
+Signed-in pages check GitHub releases automatically. A newer release adds an arrow
+after the version and opens its changelog/update modal. Enable installation with
+the [host updater](updates.md); GitHub Actions performs verification only.
+
+## Local Telegram polling (no public URL)
+
+Set these values in `.env` and restart **both** app and worker:
+
+```dotenv
+TELEGRAM_TRANSPORT=polling
+PUBLIC_ORIGIN=http://localhost:3000
+```
+
+```sh
+docker compose config --quiet
+docker compose up --build -d
+```
+
+Ensure the container's Node user can read the encryption key and, on SELinux
+hosts, its label permits container access. Keep `secrets/` private.
+
+Save a workspace and bot token in Setup. Selecting polling explicitly opts the worker
+into outbound Telegram requests using the saved bot credential, including before
+activation so receiver readiness can be checked. Save the chat model; the bot
+activates automatically after the polling worker connects. The bot denies ordinary
+requests until the web administrator approves or allows Telegram users from
+**Members & access**. Personal Telegram
+account linking is optional and can happen later. The model, tenant and approval
+requirements are identical in both modes. No webhook or tunnel is needed. The setup
+progress API reports receiver readiness in both transport modes.
+An allowed user who messages the bot before activation receives a throttled setup
+notice instead of an AI response.
+
+Polling and webhook delivery cannot operate on the same bot at the same time. If the
+bot already has a webhook, polling reports a conflict and makes no `deleteWebhook`
+call. Stop its previous deployment and deliberately remove that webhook via Telegram's
+`deleteWebhook` method with `drop_pending_updates=false` before switching. Stop any
+other application polling the same token. Return to webhook mode by stopping the
+polling worker, setting `TELEGRAM_TRANSPORT=webhook`, restarting app/worker, and explicitly
+registering a public HTTPS webhook in Setup.
+
+The worker serializes polling through a PostgreSQL session advisory lock. It persists
+the next update offset only after the existing transactional ingress accepts the
+update. Replayed updates are deduplicated; failed ingestion never advances the cursor.
+Offsets are scoped to the bot and reset after seven days without received updates,
+when Telegram may choose a new random update ID. Rate-limit delays persist across
+workers/restarts. Shutdown cancels pending HTTP polling and releases the lock.
+`/readyz` additionally checks recent polling success when a bot is configured. Setup
+reports pending/failed reception without exposing tokens or message contents.
+
+Worker `telegram_polling_failed` logs include a redacted `code` and
+`retry_delay_ms`. `polling_webhook_conflict` means an existing webhook blocks polling;
+`telegram_polling_conflict` indicates Telegram rejected concurrent polling;
+`telegram_unauthorized` requires checking the saved bot token;
+`telegram_rate_limited` honors Telegram's retry delay. `telegram_outcome_unknown`
+means the HTTP request failed without a confirmed response, while
+`polling_invalid_update` means update validation failed. `polling_receive_failed`
+covers other local failures, including database or ingestion errors. Raw exceptions,
+Telegram descriptions, tokens and message contents are excluded from these logs.
+Check current Setup receiver status or `/readyz` alongside log timestamps: a later
+successful poll clears the stored error, but historical failure logs remain.
+
+Sources: [Telegram getUpdates](https://core.telegram.org/bots/api#getupdates),
+[PostgreSQL advisory locks](https://www.postgresql.org/docs/17/explicit-locking.html#ADVISORY-LOCKS).
+
+## Configure a staging bot deliberately
+
+These actions contact Telegram. Webhook registration is never performed during
+installation, image build, migration, automated tests or ordinary service startup.
+Webhook remains the default transport; polling starts only when explicitly configured.
+
+1. Configure an HTTPS reverse proxy and set `PUBLIC_ORIGIN` to its exact origin,
+   without a trailing slash. Restart the app and worker after origin changes.
+2. Enter a dedicated BotFather token in Setup. Save calls `getMe` and shows its identity.
+3. Click **Register Telegram webhook** under **Site domain** in the admin panel. This reconciles `getWebhookInfo` and
+   `setWebhook` without dropping pending updates. Only verification/control interactions
+   work until activation. Alternatively, explicitly run
+   `REGISTER_STAGING_WEBHOOK=yes bun run register:webhook` with host configuration.
+4. Configure the OpenAI-compatible model base URL, API key, model ID and thinking
+   level under **Model settings**. The default base URL is
+   `https://api.openai.com/v1`, model `gpt-4.1-mini`, and thinking `off`.
+   Choose a suggested model or enter any custom ID. Set budgets and enabled skills.
+5. Successful model setup activates the bot automatically when its Telegram receiver
+   and an enabled published skill are ready. No Telegram owner or member is required
+   at activation; an empty membership means the bot denies ordinary use. Share the
+   request-access link in **Members & access** and approve a user, or enroll a known numeric ID.
+   The web administrator can also manage workspace settings, skills and access in
+   the admin panel before linking a personal Telegram account. Runs & delivery
+   shows every retained workspace run's request, response, transcript and delivery
+   text to its deployment administrator and eligible workspace owners/admins.
+   Viewing these messages does not require the deployment administrator to link
+   Telegram; sending, retrying and cancellation retain their existing checks.
+   Once Telegram updates are being received, the request-access link can collect
+   requests before activation; approval does not enable ordinary bot work.
+6. If owner actions in Telegram are needed, generate the optional identity link
+   from Model settings and open it with the intended Telegram account. This enrolls that account as an active owner. Existing sessions are revoked; sign in again. Then
+   `/linktoken` can link a group in which that user is a Telegram administrator.
+
+Telegram ID entry alone never proves identity. Extra panel accounts are created
+from **New** in Operations → Panel accounts. The dialog collects the username and
+password; the created account ID appears on the page. Enroll the intended Telegram
+ID in Members, then choose **Issue link** in Operations → Identity verification.
+Select the workspace and enter the panel account ID in the dialog. The one-use
+identity link appears on the page after submission. Extra accounts have no
+deployment-operator privileges.
+
+Operations also offers **Recover access** for an existing workspace owner/admin
+and **Inspect run** for redacted run status, each in its own dialog. Cancel
+discards input; failures retain it for retry. Deployment-wide pause/resume opens
+a confirmation dialog before changing activity.
+
+Group collection is off by default. Disable BotFather privacy where appropriate,
+recheck visibility under Group access, and explicitly consent with `/capture on`
+in the group or the panel. Collection covers received messages, including authors
+who are not workspace members, and does not import old history.
+
+## OpenAI-compatible model settings
+
+The setup wizard saves Telegram credentials before moving to GitHub. The admin
+panel's **Model settings** page shows provider and chat-model summaries with modal
+editors. A successful model save activates the bot automatically once its Telegram
+receiver and an enabled published skill are ready. The worker retries that transition
+when later prerequisites become ready or after restart. Replacing a bot token
+temporarily disables reception until it is ready again, then activation is automatic.
+Deployment pause and member approvals remain independent. Errors leave entered values in place. A saved credential
+can be retained by leaving its write-only field blank. Model settings shows saved
+values in a compact summary card, with only configured/missing status for the API
+key. Click **Edit** to open the model configuration modal. Open **Advanced model
+settings** inside it for thinking level, capacity overrides and token prices,
+including optional overrides for custom models. Cancel discards the draft; saving
+closes the modal and updates the summary. You can return to those controls later.
+Activation never displays credentials.
+
+Only deployment operators can change these settings. The base URL includes the API
+prefix (usually `/v1`); requests go to its `/chat/completions` endpoint using streaming
+and bearer API-key authentication. HTTP and HTTPS endpoints are supported, including
+local servers reachable from the worker. In Docker, `localhost` refers to the worker
+container. URLs containing credentials, query strings or fragments are rejected.
+
+The API key is encrypted and write-only. Leave its field blank to retain it; changing
+an endpoint with an existing key requires entering the key for the new endpoint.
+Saving does not contact the model server or validate its credentials/capabilities.
+
+Thinking choices are `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`.
+Non-off choices are sent as OpenAI-style `reasoning_effort`; choose a level supported
+by your server/model. `off` omits this parameter and leaves the server's default in
+effect; it cannot disable reasoning that a model always performs. The server must
+support streaming Chat Completions, tool calling, `max_completion_tokens`, and
+`store:false`. Provider-specific thinking formats are not configured by this form.
+
+Known OpenAI IDs use Pi's bundled price metadata unless you supply a price override.
+Each price is optional and can be overridden independently. Missing custom-model
+prices remain unknown; explicit zeros identify a free model. Unknown-price calls
+can run with unlimited workspace budgets, retain token counts and are excluded from
+dollar totals. A finite run/month budget requires known input and output prices
+before dispatch (`model_pricing_required_for_budget`). Unpriced historical calls
+also block finite budgets until their actual costs are reconciled. An input override
+prices cached input at that rate. Review prices when changing models/providers;
+recorded costs are estimates, not an upstream billing guarantee.
+
+The worker pins model capacity, endpoint, thinking level and prices at the first execution of a run.
+Later thinking/price edits apply to future runs. If an endpoint changes, unfinished
+runs pinned to the old endpoint stop before another model dispatch. Existing saved
+configurations without these fields use the default URL and thinking `off`.
+
+See [the API example](../../examples/model-settings.http) and
+[Pi's custom-model documentation](https://github.com/earendil-works/pi/blob/main/packages/ai/README.md).
+
+## Model capacity and workspace budgets
+
+Known model IDs use the bundled Pi catalog for context window and maximum output.
+The catalog is versioned package data, not a live provider discovery request. Proxies
+may differ: operators can override either value in **Model configuration** using their
+provider's documented token limits. Both capacity fields and both prices are optional
+in Advanced model settings. A blank context window lets the provider enforce its
+own limit, including for known models; the app does not reject input using an assumed
+window. Catalog context metadata remains available for conversation-memory planning.
+Unknown models have no assumed context capacity and use up to 16,384 output tokens
+unless overridden; this output allowance is app policy, not a claimed provider
+capability. When a context window is explicitly configured, automatic output fits
+its remaining capacity and explicit output must leave room for input. Clear fields in the chat model
+editor to remove overrides. Set `modelLimits: null` to return to automatic values in
+the legacy deployment API. Omitted overrides there persist for the
+same model/endpoint; changing either clears them unless explicitly supplied again.
+Model limits are pinned at first execution, alongside endpoint, thinking and pricing.
+
+Deployment Model settings show model capacity. Workspace settings contain the
+workspace Pause/Resume action and saved status; Settings follows Plugins in the
+sidebar. Confirm the action in its dialog, or Cancel to leave the workspace
+unchanged. Pause cancels queued/running assistant work and pending run deliveries;
+resuming allows new work without restarting cancelled work. The Overview team
+editor manages the remaining workspace configuration and has no pause checkbox.
+Response language follows the model; there is no workspace language override.
+Input byte and output token budgets
+are managed automatically, with no workspace controls or hidden saved overrides.
+The API discards the retired `language`, `maxInputChars` and `maxOutputTokens` keys
+from older clients; migration `010_automatic_response_settings.sql` removes them from
+current workspace settings while retaining historical run snapshots.
+
+Before each model call, serialized UTF-8 input bytes provide a conservative token
+estimate. Output allowance fits the model's configured/catalog/default output allowance,
+any explicitly configured context window, and what the remaining USD budgets can
+reserve. With no context override, the provider enforces its context limit. This is not an exact
+provider tokenizer count. Tool definitions, history and tool results all count.
+The worker never silently summarizes context or translates the model's response.
+Bounded evaluation scripts can still supply internal input/output caps.
+
+USD run/month budgets accept finite non-negative amounts without the old $5/$1,000
+ceilings. Both budgets are checked transactionally before each dispatch; unknown
+charges remain reserved. Run and monthly budgets default to None (no limit), saved
+as `null`. Clear either budget field to restore None; an entered zero permits only
+zero-cost requests. Existing explicit dollar budgets remain configured until edited.
+Model calls per run has been removed; older clients' `maxTurns` is discarded and
+migration `018_remove_model_call_limit.sql` removes current saved overrides. Historical
+run snapshots remain audit evidence and no longer impose call quotas. Ordinary
+assistant requests have no fixed model-call or tool-call quota. Set
+`RUN_TIMEOUT_SECONDS` in `.env` (default 300, range 1–1800)
+and redeploy to change the total wall-time allowance per execution. Reasoning
+models can need more than the previous 90 seconds. Queue expiry is set 60 seconds
+beyond this limit. Existing queued jobs retain their original queue expiry; let
+pending work drain before increasing the deadline. Timeouts report `run_timeout`;
+shutdown reports `worker_shutdown`, while explicit user cancellation remains
+`cancelled`. An interrupted request with unconfirmed usage keeps its reservation
+until billing reconciliation; raising the deadline does not retry old failures. Concurrent reservations can still exhaust the remaining
+budget between estimating output and reserving it; the final transaction prevents
+overspend before dispatch.
+
+The form reports individual invalid fields; API validation includes safe `issues`
+with field paths and messages, never submitted values. Runtime logs preserve
+`input_budget_exceeded`, `model_output_limit_exceeded`, `model_context_limit_exceeded`
+and `model_pricing_required_for_budget`. Changes apply to new runs; failed runs are not retried
+automatically. Large outputs still use the existing Telegram reply truncation; this
+change does not introduce long-message delivery or remove the response-length prompt.
+
+## Admin creation dialogs
+
+Use the Add/Create icons to open creation dialogs for workspaces, members,
+workflows, skills/imports, instructions, run requests, panel accounts, plugins,
+repositories/networks and GitHub Apps. Save/submit completes the existing action;
+Cancel or Escape discards that dialog's draft. Errors leave the dialog open for
+correction. Related edit controls open the same editor. Existing settings and
+member forms remain on their pages.
+
+For Code Truth, **Add repository** opens repository and branch fields. **Add network**
+opens a nested dialog; cancelling it preserves the repository draft. Choose
+**Apply repository**, then **Save Code Truth** to persist all configuration changes.
+GitHub App creation opens its owner/name dialog before continuing to GitHub.
+
+## Development and checks
+
+```sh
+bun run check
+bun run typecheck
+bun test ./tests
+bun run build
+bun run test:runtime
+```
+
+For host processes set `DATABASE_URL`, `PUBLIC_ORIGIN`, and `ENCRYPTION_KEY` (64 hex
+characters) or `ENCRYPTION_KEY_FILE`. Then run `bun run migrate`, `bun run dev` and
+`bun run worker` separately. `dev` runs TypeScript under Node; build produces the
+Node entry points plus the browser bundle. Node does not load `.env` automatically.
+
+Integration tests create and drop uniquely named disposable databases; the test
+PostgreSQL user needs `CREATEDB`. They never operate on the application database.
+
+```sh
+TEST_DATABASE_URL=postgres://postgres:test@localhost:5432/postgres bun test ./tests
+bunx playwright install chromium
+TEST_DATABASE_URL=postgres://postgres:test@localhost:5432/postgres bun run test:browser
+```
+
+Without `TEST_DATABASE_URL`, PostgreSQL tests explicitly skip. CI supplies a real
+PostgreSQL service. Browser fixtures and fake transports exist only in `tests/`;
+they are excluded from the Docker image. If your host configures an HTTP proxy,
+set `NO_PROXY=localhost,127.0.0.1` for tests (including the local model HTTP fixture).
+
+GitHub's **Verify** workflow runs quality/database checks, one browser job for the
+complete suite, and application container checks. It excludes the separate Code
+Truth service install/typecheck/image smoke and Codex image/lifecycle job.
+Quality runs `bun test ./tests` so Bun does not recursively discover the optional
+service's tests. Running bare `bun test` from the repository root also discovers
+`services/code-truth/tests`, which requires that service's separate dependencies.
+All verification and Codex diagnostics jobs target self-hosted
+Linux x64 runners with the labels `self-hosted`, `linux` and `x64`. Register an
+online runner available to this repository before running these workflows. Use an
+Ubuntu host with Git, Bash, Node 24, Docker Engine and Compose v2, with Docker access
+without interactive sudo. Browser jobs also need noninteractive sudo to install
+Chromium system dependencies; the workflows install Bun themselves.
+
+Give each runner its own host or isolated Docker daemon: verification uses fixed
+localhost ports 5432 and 3000, image tags and a disposable Compose project. Multiple
+runner agents sharing those resources can conflict. Parallel execution requires
+multiple available runners; a single runner queues the jobs and runs them serially.
+For the existing VPS, use the [dedicated Actions runner deployment](self-hosted-runner.md)
+with its own Docker daemon and network so verification does not share production ports.
+The browser job uses one worker and its own PostgreSQL service, preserving serial
+test groups. It allows 30 minutes for the complete suite. The final `checks` job
+requires every job to succeed. Panel updates require successful Verify evidence
+for the release commit; installation runs on the host updater.
+Browser installation downloads only Chromium's headless shell. The application
+Docker build caches all stages in GitHub Actions; Compose reuses the smoke-tested
+image instead of building it again. The [host updater](updates.md) builds pinned
+release images locally, without a GitHub deployment job. Confirm actual wall time in
+GitHub; cold caches, dependency updates and runner queues can take longer.
+
+The skill **Test draft policy** control is a deterministic validation/preview,
+not a claim that a live model obeyed the skill. The Pi fake-provider tests exercise
+actual validated tool execution, pause/continuation boundaries and cancellation.
+
+## Optional paid model evaluation
+
+No default check spends money. After explicitly choosing a spend cap, configure
+`OPENAI_API_KEY` and run:
+
+```sh
+ALLOW_PAID_EVALUATION=yes EVALUATION_CAP_USD=0.02 bun run evaluate
+```
+
+`EVALUATION_MODEL` overrides the provisional model. The command limits output,
+reserves estimated cost before dispatch, disables provider retries, reports usage,
+and caps the configured spend limit at $0.10. Review grounding, prompt-injection
+resistance and actual billing before selecting a pilot model. This evaluation has
+not been run with live credentials in repository implementation checks.
+
+## Stop and recover
+
+```sh
+docker compose down
+# Retains PostgreSQL volume. Do not add -v for useful data.
+```
+
+For password recovery, create a protected file readable inside the app container,
+then run `node dist/operator.js recover USERNAME PASSWORD_FILE` there. It updates an
+existing operator and revokes their sessions; public bootstrap never reopens.
+
+Use [the release runbook](release-runbook.md) for backups, restore, unknown outcomes,
+key rotation and staging release checks.
+
+## Runtime logs
+
+Open **Deployment → Runtime logs** at `/admin/logs` (deployment operators only).
+Filter by severity or service, search event/error codes or run IDs, and browse with
+the arrows inside the entries card. The Auto-refresh menu offers 10 seconds,
+30 seconds, one minute (default), five minutes or Off. Refresh now reloads the
+current page; Latest logs returns to the newest entries. Older pages pause automatic
+refresh to preserve your place. The panel stores new structured API/worker/polling/run/delivery events; it does
+not import earlier container output. Workspace run metadata is shown only to its
+operator and disappears from the panel after workspace deletion.
+
+Messages and error codes come from an explicit catalog. Secrets, request URLs/bodies,
+raw exceptions, model prompts/results and Telegram message contents are never captured.
+The worker prunes records older than seven days and keeps the latest 10,000 entries
+once per minute. Writes are buffered and best-effort; storage failures never fail a
+bot request. Container output remains available for startup/database failures:
+
+```sh
+docker compose logs --tail=100 -f app worker
+# Docker equivalent:
+docker compose logs --tail=100 -f app worker
+```
+
+The existing workspace **Audit** page records configuration and approval actions;
+**Runtime logs** explains service activity and failures. See
+[the log API example](../../examples/runtime-logs.http).
+
+## LLM plugins (Pi extensions)
+
+Open **Workspace → Plugins** as a deployment operator. Register reviewed Pi extension
+files already installed on the server, choose their exact tool names, then enable
+and save for the selected workspace. The page supports editing versions, disabling,
+removing registrations, file status, search and recent change history. Settings persist
+independently per workspace in PostgreSQL and apply to new worker runs without a restart. Older in-flight settings
+are rejected at the next guard. Conflicting edits require reloading the saved revision.
+
+Start with [the word-count extension](../../examples/pi-extension.ts). On a host,
+enter its absolute local path. In containers, mount an `extensions/` directory at the
+same path in the API and worker. The [Compose override](../../examples/extensions.compose.yaml)
+provides read-only mounts at `/app/extensions`; its optional fallback manifest should
+be `extensions/extensions.json` (use `[]` if configuring entirely through the panel):
+
+```sh
+docker compose -f compose.yaml -f examples/extensions.compose.yaml config --quiet
+docker compose -f compose.yaml -f examples/extensions.compose.yaml up --build -d
+```
+
+Use the same Compose file arguments for subsequent lifecycle commands. In the panel,
+register `/app/extensions/pi-extension.ts`, tool `count_words`, and
+an explicit version. New entries default to disabled. Registering/removing a plugin
+never creates, changes or deletes its executable file. There is no web package installer.
+Only reviewed read-only code is supported; files run in-process with worker permissions.
+
+Existing `PI_EXTENSIONS_FILE` grants remain a fallback until that workspace’s
+first panel save. Set it consistently for the API and worker if using a manifest.
+An empty saved panel registry deliberately disables all file plugins for that workspace
+and does not reactivate the fallback. Other workspaces’ settings and revisions are independent.
+
+“File verified” checks the API's view of the file, not runtime compatibility or the
+worker mount. After reviewing changed code, update its plugin version and save to
+pin the new contents. Unrelated edits preserve existing hashes. Restart workers after
+upgrading imported dependencies. See [compatibility and policy](../design/llm-extensions.md)
+and [the API example](../../examples/plugins.http). No setup step invokes Telegram
+or a paid model.
+
+### Predefined Code Truth
+
+For local source-code queries, follow [Code Truth setup](code-truth.md). This optional private service has its own dependency installation and persistent index volume. Repository and branch settings for the selected workspace are managed in **Workspace → Plugins → Code Truth**.
+
+Plugin settings previously stored per operator are copied into independent workspace
+registries by migration `006_workspace_plugins.sql`; existing workspace grants and
+file hashes are preserved. Run migrations before starting the updated API and worker.
+
+## Approve requests for bot access
+
+After applying migration `009_access_requests.sql`, unauthorized users can press
+**Request access** in Telegram. In **Workspace → Members & access → Access requests**, review
+the Telegram ID/name and choose **Approve access** or **Reject request**. Approval
+adds a regular member, allows their ID and queues a Telegram confirmation. They can
+then send a new bot request; their original message is not automatically executed.
+
+Share the request-access link shown in that section when your bot serves multiple
+workspaces. It opens the correct workspace's request flow without granting access.
+Reopen the page to load new requests. A Reload access requests action appears
+after a failed request or conflicting edit. See
+[access-control behavior and limits](../design/access-control.md#telegram-access-requests-implemented-2026-09-20)
+and [the API example](../../examples/access-requests.http).
+
+## Rich replies and native Stop (Bot API 10.3)
+
+Updated app/worker code sends model answers as rich messages, with native private
+streaming and Stop. No dependency or database migration is needed. Restart both
+processes together. For webhook deployments, explicitly use **Register verification
+webhook** in Setup after updating to add `stopped_message_generation` to the existing
+subscription; ordinary startup does not register it. Polling uses the updated allowed
+updates automatically after worker restart. Old previews without a stored draft/run
+binding cannot be stopped through the native event; `/cancel` remains available.
+
+See the [manual staging check](../../examples/telegram-streaming.md). No live Telegram
+request is part of build/test or this implementation change.
+
+## Optional Codex feature and bug implementation
+
+Configure credentials and the workspace-wide workflow under **Plugins → Codex**.
+Codex uses GitHub’s default branch and verified collaborator permissions; there are
+no plugin repository or maintainer grants. Codex prepares the environment and selects
+verification automatically. Members connect GitHub with `/github connect`. Follow [the complete setup](codex-coding.md)
+and [the local runner guide](codex-runner.md) with
+`deploy/codex/compose.yaml`. Configure the custom Responses provider endpoint/model
+in deployment settings, then save the workspace API key in **Plugins → Codex
+implementation**. Keys are encrypted and never displayed again.
+`CODEX_PROVIDER_API_KEY` is an optional supervisor environment fallback. Older
+GitHub Actions configurations must be saved with the local runner before new
+coding tasks can run.
+
+## Telegram image and attachment input
+
+The bot accepts photos, image documents, UTF-8 text/code attachments and PDFs with
+selectable text. Restart the updated API and worker together; no SQL migration or
+webhook subscription change is needed. Images require a vision-capable model. See
+[supported input and limits](telegram-attachments.md) and the
+[manual staging check](../../examples/telegram-attachments.md).
+
+## Shared model providers
+
+**Model settings → Model providers → New** opens the provider editor. Saving sends
+credential-bearing server-side `GET BASE_URL/models`, with redirects disabled,
+a 15-second timeout and a 1 MiB response limit (8 MiB for OpenRouter/New API).
+A URL with no API path uses `/v1` (OpenRouter uses `/api/v1`, Groq `/openai/v1`);
+other API paths are preserved. Failed discovery leaves the editor open and does
+not replace the saved provider. Edit fetches the current model list again. A changed
+URL requires re-entering the key; a blank key retains it only for the same URL.
+
+Providers are operator-owned records in deployment JSONB, with encrypted keys bound
+to operator/provider IDs. APIs return safe labels, URLs, model IDs and configured
+status and typed price/context metadata. Each workspace saves its bot chat selection; Codex and Review Bot choose
+independently from the same catalog. Removing an in-use provider is rejected.
+A provider update affects new Codex/review attempts; already-running attempts keep
+their sealed credentials and endpoint/model snapshot. Cancel them to stop existing
+work. Chat runs stop when their pinned provider or model-selection revision changes.
+Workspace deletion removes its selection; shared provider configuration remains.
+
+Chat uses Chat Completions. Codex and OCR delegation use the Codex Responses path;
+select a compatible model/provider for those services. `/models` does not prove
+protocol support. **Provider type** detects exact official URLs or selects an
+adapter explicitly; choose **New API (self-hosted)** for New API instances.
+OpenRouter automatically fetches prices, cache rates and capacity from `/models`.
+New API also reads its public `/api/pricing` without sending the inference key.
+Enter the API key's **New API billing group** to apply the group multiplier; no
+group or inaccessible pricing leaves prices unknown. Per-call and expression
+billing are not converted to token prices.
+
+Official compatible providers use their own Pi catalogs where the model API
+omits prices/limits; unknown reseller models never inherit OpenAI prices solely
+from their names. DeepSeek fetches context/output metadata when present and uses
+a dated official price reference for current Flash/Pro aliases. Both peak/off-peak
+tiers and cache-hit/miss prices remain visible; accounting defaults to peak
+estimates. Advanced chat model settings can explicitly select Off-peak estimates.
+Prices are estimates, not upstream billing guarantees.
+
+The editor and saved summary show automatic information and its source separately
+from overrides. Advanced settings support independent input/output/cache-hit/cache-write
+price overrides with the selected currency. A supplied input override also prices
+cache tokens at that rate unless an explicit cache override is entered. Blank
+context windows still defer enforcement to the provider. Unknown capacity uses
+the documented automatic app output allowance. Unknown prices require unlimited
+budgets. API metadata and manual overrides are pinned with each run. See the
+[standalone module contract](../../src/model-metadata/README.md) and
+[provider API examples](../../examples/model-providers.http). No paid model call
+is made by provider discovery. Old deployment chat settings and saved Codex keys
+remain supported until the service switches to a shared provider. ChatGPT device
+code sign-in remains an independent option.
