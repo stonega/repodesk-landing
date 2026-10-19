@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Walkthrough from "../components/walkthrough";
+import WorkflowDiagram from "../components/workflow-diagram";
 
 export const REPO_URL = "https://github.com/stonega/repodesk";
 export const DOCS_URL = "/docs/user/get-started";
@@ -214,6 +215,7 @@ export default function Home() {
               </article>
             ))}
           </div>
+          <WorkflowDiagram />
         </section>
         <section
           id="principles"
