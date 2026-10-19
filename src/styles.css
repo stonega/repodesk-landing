@@ -457,6 +457,207 @@ h3 {
   line-height: 1.9;
   max-width: 295px;
 }
+.workflow-diagram {
+  margin: 48px 0 0;
+  padding: 28px;
+  border: 1px solid #36594e;
+  border-radius: 16px;
+  background: #163b34;
+  color: #e4eddf;
+}
+.workflow-diagram figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.workflow-diagram .eyebrow {
+  color: #b5cbbf;
+  margin-bottom: 10px;
+}
+.workflow-diagram figcaption p:last-child {
+  margin: 0;
+  font-size: 15px;
+}
+.diagram-motion-toggle {
+  visibility: hidden;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #779b87;
+  border-radius: 6px;
+  color: #e4eddf;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+.is-animated .diagram-motion-toggle {
+  visibility: visible;
+}
+.diagram-motion-toggle[aria-pressed="true"] {
+  color: #163b34;
+  background: #d9eab2;
+}
+.diagram-motion-toggle:focus-visible {
+  outline-color: #d9eab2;
+}
+.diagram-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 27% 27% 39%;
+  gap: 3.5%;
+  align-items: center;
+  height: 240px;
+  max-width: 720px;
+  margin: 30px auto 0;
+}
+.diagram-connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.flow-track {
+  stroke: #547366;
+  stroke-width: 1.5;
+}
+.flow-dot {
+  stroke: #d9eab2;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 99.9;
+}
+.is-animated .flow-dot {
+  animation: connection-flow 4s linear infinite;
+}
+.is-animated .flow-dot-1 {
+  animation-delay: -2s;
+}
+.is-animated .flow-dot-2 {
+  animation-delay: -1s;
+}
+@keyframes connection-flow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+.diagram-repositories,
+.diagram-hub,
+.diagram-telegram {
+  position: relative;
+  min-width: 0;
+}
+.diagram-repositories {
+  display: grid;
+  gap: 24px;
+}
+.diagram-label {
+  position: absolute;
+  top: -24px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #b5cbbf;
+}
+.diagram-repository {
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #4c6b5c;
+  border-radius: 12px;
+  background: #284d40;
+  font-size: 14px;
+}
+.diagram-repository span {
+  color: #b5cbbf;
+  font-size: 12px;
+}
+.diagram-hub {
+  display: grid;
+  justify-items: center;
+}
+.diagram-hub img {
+  z-index: 1;
+}
+.diagram-hub strong {
+  position: absolute;
+  top: 60px;
+  font-size: 12px;
+  color: #d9eab2;
+}
+.flow-halo {
+  position: absolute;
+  top: -8px;
+  width: 64px;
+  height: 64px;
+  border: 1px solid #d9eab2;
+  border-radius: 18px;
+  opacity: 0.15;
+}
+.is-animated .flow-halo {
+  animation: hub-glow 4s ease-in-out infinite;
+}
+@keyframes hub-glow {
+  50% {
+    opacity: 0.4;
+    transform: scale(1.08);
+  }
+}
+.diagram-telegram {
+  border: 1px solid #5d7e6f;
+  border-radius: 16px;
+  background: #1a4038;
+  font-size: 13px;
+  padding: 14px 12px;
+}
+.diagram-chat-title {
+  display: block;
+  padding-bottom: 12px;
+  font-size: 15px;
+}
+.diagram-channel {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 5px;
+  color: #c0d2c4;
+  background: #254b3f;
+}
+.diagram-question {
+  width: fit-content;
+  margin: 12px 0 10px auto;
+  padding: 8px 10px;
+  border-radius: 10px 10px 3px 10px;
+  background: #325b4b;
+}
+.diagram-answer {
+  display: grid;
+  gap: 6px;
+  border-radius: 10px 10px 10px 3px;
+  padding: 10px;
+  color: #163b34;
+  background: #d9eab2;
+}
+.diagram-answer span,
+.diagram-team {
+  font-size: 11px;
+}
+.diagram-team {
+  display: block;
+  margin-top: 10px;
+  color: #b5cbbf;
+}
+.diagram-note {
+  margin: 20px 0 0;
+  font-size: 11px;
+  color: #b5cbbf;
+}
+.workflow-diagram.is-paused .flow-dot,
+.workflow-diagram.is-paused .flow-halo {
+  animation-play-state: paused;
+}
 .principles {
   background: #e9eee0;
   border-block: 1px solid #e0e6d7;
@@ -722,6 +923,48 @@ details p {
   .principle-list p {
     max-width: none;
   }
+  .workflow-diagram {
+    padding: 20px 14px;
+  }
+  .workflow-diagram figcaption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .diagram-repository {
+    padding: 8px;
+    font-size: 12px;
+  }
+  .diagram-stage {
+    height: 280px;
+  }
+  .diagram-repositories {
+    gap: 40px;
+  }
+  .diagram-telegram {
+    padding: 12px 8px;
+    font-size: 11px;
+  }
+  .diagram-channel {
+    padding-inline: 4px;
+    font-size: 10px;
+  }
+  .diagram-hub img {
+    width: 40px;
+    height: 40px;
+  }
+  .flow-halo {
+    width: 56px;
+    height: 56px;
+  }
+  .diagram-question,
+  .diagram-answer {
+    padding: 8px;
+  }
+  .diagram-answer span,
+  .diagram-team {
+    font-size: 10px;
+  }
   .closing {
     padding: 30px 24px;
     flex-direction: column;
@@ -745,6 +988,13 @@ details p {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .workflow-diagram .flow-dot,
+  .workflow-diagram .flow-halo {
+    animation: none;
+  }
+  .diagram-motion-toggle {
+    display: none;
+  }
   html {
     scroll-behavior: auto;
   }

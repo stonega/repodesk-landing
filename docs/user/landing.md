@@ -35,5 +35,18 @@ state and associated panel; inactive content is hidden and inert.
 
 The panels share a grid footprint sized to the longest example, avoiding layout
 jumps without clipping text. The selected tab has an underline as well as a green
-background. No animation or extra UI dependency is used; reduced motion remains
-supported. Local deterministic tests require no model, Telegram or GitHub access.
+background. The panels do not animate or require an extra UI dependency; reduced
+motion remains supported. Local deterministic tests require no model, Telegram or GitHub access.
+
+## Animated workflow diagram
+
+The workflow section includes an illustrative GitHub → RepoDesk → Telegram diagram.
+Small dots follow the curved connections and the existing green RepoDesk mark has
+a subtle halo. Repository names and chat messages are examples, not live activity.
+The diagram uses local SVG and CSS only, with no animation dependency or network calls.
+
+Use the **Pause diagram animation** toggle with click, Enter or Space to stop all
+diagram motion; its pressed state indicates that motion is paused. Toggle it again
+to resume from the same position. With the system’s reduced-motion preference enabled,
+the diagram remains static and the unnecessary motion toggle is hidden. Content,
+navigation and the example walkthrough remain available without animation or JavaScript.
