@@ -2,10 +2,12 @@
 
 Current workflows are package.json commands. Add repeatable automation here when needed.
 
-`bun run docs:sync [FULL_UPSTREAM_COMMIT_SHA]` refreshes the unmodified product
-documentation snapshot from public stonega/repodesk using Git without credentials.
-Without a SHA it reproduces the pinned version. See
-[documentation maintenance](../docs/implementation/documentation.md).
+`bun run docs:sync [CHECKOUT_PATH]` refreshes only `docs/user/` from the local
+RepoDesk checkout, defaulting to `../repodesk`. It copies the original bytes into
+this repository's `docs/user/`, removes stale synced guides and regenerates the
+route/hash manifest. Uncommitted source edits are recorded for accurate attribution.
+The local landing guide is preserved. See the [README](../README.md#product-documentation)
+for refresh and verification commands.
 
 After `bun run build`, `bun scripts/verify-docs-build.tsx` verifies that all
 documentation pages contain the full rendered original body and pinned source.

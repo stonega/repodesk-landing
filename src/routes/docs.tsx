@@ -24,7 +24,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => [
   { title: `${data?.document.title ?? "Documentation"} — RepoDesk Docs` },
   {
     name: "description",
-    content: `${data?.document.title ?? "Product documentation"} from the RepoDesk product repository. Original source, design proposals, implementation guidance and evidence.`,
+    content: `${data?.document.title ?? "User documentation"} from the RepoDesk user guides. Deployment, configuration, Telegram workflows and integrations.`,
   },
 ];
 
@@ -88,17 +88,19 @@ export function DocumentationPage({
           <div className="docs-provenance">
             <p className="eyebrow">REPODESK DOCUMENTATION</p>
             <p>
-              Original Markdown from <strong>stonega/repodesk</strong>. This
-              versioned snapshot includes proposals and research, not just
-              shipped features. See the{" "}
-              <a href="/docs/implementation/implementation-status">
-                implementation evidence
-              </a>{" "}
-              for current scope and limits.
+              User guides from <strong>stonega/repodesk</strong>. Available
+              features depend on your deployment version, connected services and
+              workspace settings.
             </p>
             <a href={sourceUrl(document)}>
-              View source at {docsSnapshot.revision.slice(0, 7)}
+              {document.modified
+                ? "View upstream source at "
+                : "View source at "}
+              {docsSnapshot.revision.slice(0, 7)}
             </a>
+            {document.modified && (
+              <p>This guide includes local edits since that revision.</p>
+            )}
           </div>
           <article aria-label={document.title}>
             <DocumentMarkdown content={content} source={document.source} />

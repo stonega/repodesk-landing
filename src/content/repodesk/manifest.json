@@ -1,264 +1,132 @@
 {
   "repository": "https://github.com/stonega/repodesk",
-  "revision": "521ccc0c585670aa723499364f8c26e97972cf9e",
+  "revision": "b292e6cce13e1e675461c446a9d555257f5c30fd",
   "documents": [
     {
-      "source": "docs/README.md",
+      "source": "docs/user/README.md",
       "route": "/docs",
-      "title": "Product documentation",
-      "sha256": "a3206c35a0ce8d2771d07553e3a4b688c1f106214a13b78cb86c4d590dbb2cd2"
+      "title": "RepoDesk 用户文档",
+      "sha256": "eb4a5a51cc98dcb1f2db563e1e070d756838aba4e1100eb55ae59ffa06bfcd7d",
+      "modified": false
     },
     {
-      "source": "docs/design/access-control.md",
-      "route": "/docs/design/access-control",
-      "title": "Workspace membership and access",
-      "sha256": "62825cde226631b87d68063c088b252a63f1a25213a41ce91be54f333d6a351b"
+      "source": "docs/user/administration.md",
+      "route": "/docs/user/administration",
+      "title": "工作区与成员",
+      "sha256": "49938775ee4b74c84be66f3a0e8b1eac6e4667f1ee0dbbc038e7b557518ced85",
+      "modified": false
     },
     {
-      "source": "docs/design/admin-panel.md",
-      "route": "/docs/design/admin-panel",
-      "title": "Admin web panel",
-      "sha256": "be73e457a08ae24bbf37cf00f7c487273e0cb2f84cd5e4de426309a30c358d66"
+      "source": "docs/user/cloudflare.md",
+      "route": "/docs/user/cloudflare",
+      "title": "Cloudflare",
+      "sha256": "1a678b5eff0d8529fec7e3bbe6d1eebd0bf8d95a99fdee21badd2919652cd13c",
+      "modified": false
     },
     {
-      "source": "docs/design/agent-skills.md",
-      "route": "/docs/design/agent-skills",
-      "title": "Agent skills managed in the web panel",
-      "sha256": "bf9ab5d9c3db3dad0d92c4bbcbca55d65b665820ef66e95a2332d6ddbc031f1d"
+      "source": "docs/user/code-truth.md",
+      "route": "/docs/user/code-truth",
+      "title": "代码问答：Code Truth",
+      "sha256": "3abe9eebbb3a9d8c084ee2fdde00f94357b291a3dd39a917215085aeea6655d4",
+      "modified": false
     },
     {
-      "source": "docs/design/architecture.md",
-      "route": "/docs/design/architecture",
-      "title": "Architecture",
-      "sha256": "3791534a1b1800d22c13a308d08ea29849dba464989f1091d29193aa4c4edf99"
+      "source": "docs/user/codex.md",
+      "route": "/docs/user/codex",
+      "title": "Codex 开发任务",
+      "sha256": "82fd07535d627e565c26fd56c3fb33e0e8a0e86d49ddc7fc7c26dfb99dc29f97",
+      "modified": false
     },
     {
-      "source": "docs/design/codex-collaboration.md",
-      "route": "/docs/design/codex-collaboration",
-      "title": "Continuous development through Telegram",
-      "sha256": "99e562a3c0cd6d2627df29420412143c97723d8ce2617d0e6d6b41b870f950a7"
+      "source": "docs/user/commands.md",
+      "route": "/docs/user/commands",
+      "title": "命令参考",
+      "sha256": "bcade2527455ffbb979393cb66daa857c0d0e336ede68c3161cea45170aa4c2a",
+      "modified": false
     },
     {
-      "source": "docs/design/first-run-setup.md",
-      "route": "/docs/design/first-run-setup",
-      "title": "First-run onboarding and initial admin",
-      "sha256": "629635d7925044b742856576f64794a63553299b6ac7b80d32aca641cf4b8ba1"
+      "source": "docs/user/configuration.md",
+      "route": "/docs/user/configuration",
+      "title": "模型与配置",
+      "sha256": "d995010fe1e8a9a0a255faf41a8134bb0c5c0858b4c1cf04cb4f18958546230a",
+      "modified": false
     },
     {
-      "source": "docs/design/github-workflows.md",
-      "route": "/docs/design/github-workflows",
-      "title": "GitHub work through Telegram",
-      "sha256": "4f10bcd89c822fbd1080abe66393d59996746111ba37130d0ca3d06424542c21"
+      "source": "docs/user/deployment.md",
+      "route": "/docs/user/deployment",
+      "title": "公开部署与 HTTPS",
+      "sha256": "e297be50d976bd1519b3b7a14449cf23810ad9c13f594b555dfc01a5e362e972",
+      "modified": false
     },
     {
-      "source": "docs/design/group-conversations.md",
-      "route": "/docs/design/group-conversations",
-      "title": "Group conversations and natural follow-ups",
-      "sha256": "7974d464f953258e340b9267779d1635defb88e2b6db47257bf87693471a307a"
+      "source": "docs/user/get-started.md",
+      "route": "/docs/user/get-started",
+      "title": "Get started：快速开始",
+      "sha256": "478894f5ed2cc10f70326208884916ad3bd0ce181b6f4af5dd94296662f798e2",
+      "modified": false
     },
     {
-      "source": "docs/design/llm-extensions.md",
-      "route": "/docs/design/llm-extensions",
-      "title": "LLM extensions (plugins)",
-      "sha256": "c71e7e6265daeadb56cc66b493c039fd10497ecbd0c0f06eadac6ded517251b5"
+      "source": "docs/user/github.md",
+      "route": "/docs/user/github",
+      "title": "连接和使用 GitHub",
+      "sha256": "81f293e821480ac66b5d664a9a68722f8049007ce2e6005cde407da8500a3dc4",
+      "modified": false
     },
     {
-      "source": "docs/design/long-term-memory.md",
-      "route": "/docs/design/long-term-memory",
-      "title": "Long-term conversation memory",
-      "sha256": "be109f320ad2e7c2a7c1e520e02065caebdeac7d9018eb97583fcd47f66fc755"
+      "source": "docs/user/groups.md",
+      "route": "/docs/user/groups",
+      "title": "群组与话题",
+      "sha256": "185c1240727f04eb1c7d214fd3805d6a8adeafa7cf67bef15af43c9947f9696d",
+      "modified": false
     },
     {
-      "source": "docs/design/private-threads.md",
-      "route": "/docs/design/private-threads",
-      "title": "Private conversation threads",
-      "sha256": "f65123bf1325f4de9b302ba5a813cbb6cae4be9a0c261bb2725905214f698000"
+      "source": "docs/user/maintenance.md",
+      "route": "/docs/user/maintenance",
+      "title": "备份、升级与恢复",
+      "sha256": "9badd1833524fb74d53823ccc98021bc3356712a4ec3b9fa496963d8ff739577",
+      "modified": false
     },
     {
-      "source": "docs/design/product-requirements.md",
-      "route": "/docs/design/product-requirements",
-      "title": "RepoDesk: Telegram product requirements",
-      "sha256": "c04b80ab7772c7406b6575f65ff73ceb901a553b2ff166d3410da2b15fcd71f6"
+      "source": "docs/user/memory-and-privacy.md",
+      "route": "/docs/user/memory-and-privacy",
+      "title": "记忆与隐私",
+      "sha256": "142d8bd3c7e39911774929d754a26ab44f1a4064e1b423b71a8c4a01c407904a",
+      "modified": false
     },
     {
-      "source": "docs/design/ui-rules.md",
-      "route": "/docs/design/ui-rules",
-      "title": "UI design rules",
-      "sha256": "1b9137793e5e130c4bbb283a7b5746ff59c33c8bafddde93c28592bcb15ada12"
+      "source": "docs/user/review-bot.md",
+      "route": "/docs/user/review-bot",
+      "title": "自动代码审查：Review Bot",
+      "sha256": "5a005bdd0b22064d0c856d8543bff54636372c393f10abc8448df697995c7439",
+      "modified": false
     },
     {
-      "source": "docs/implementation/bot-plan.md",
-      "route": "/docs/implementation/bot-plan",
-      "title": "Telegram bot implementation plan — Pi, Docker and admin panel",
-      "sha256": "95ad3ddb419951521258b0dd98e67579faa159e6806af7f93eabe0be75ddbd85"
-    },
-    {
-      "source": "docs/implementation/cloudflare.md",
-      "route": "/docs/implementation/cloudflare",
-      "title": "Cloudflare plugin",
-      "sha256": "a19adc7ef5bb565ffcd90da43ea86d62fde8c427c9e9972a683d404e141b921f"
-    },
-    {
-      "source": "docs/implementation/code-truth.md",
-      "route": "/docs/implementation/code-truth",
-      "title": "Local Code Truth extension",
-      "sha256": "ddbc6f6a3b1635c4e171fe4872f12db8f65e9ecc8991b935cbe372aa01a8d282"
-    },
-    {
-      "source": "docs/implementation/codex-auth-plan.md",
-      "route": "/docs/implementation/codex-auth-plan",
-      "title": "Codex account authentication lifecycle",
-      "sha256": "6a2403b969d93aa704d604c1183c095771e5bff214606e639a07c47714b8178e"
-    },
-    {
-      "source": "docs/implementation/codex-coding.md",
-      "route": "/docs/implementation/codex-coding",
-      "title": "Continuous Codex tasks",
-      "sha256": "3ec208ca26ef3e3be4465c55a13cece06ee3cb1e5eb6a84e99d53d2ae74c2a8b"
-    },
-    {
-      "source": "docs/implementation/codex-collaboration-plan.md",
-      "route": "/docs/implementation/codex-collaboration-plan",
-      "title": "Continuous Codex collaboration — implementation plan",
-      "sha256": "d8f62064227c817ac1d4b90018c422cc6ebf9cb0fe63175f01f75dd3725398b5"
-    },
-    {
-      "source": "docs/implementation/codex-landing-acceptance.md",
-      "route": "/docs/implementation/codex-landing-acceptance",
-      "title": "Landing-page Codex acceptance environment",
-      "sha256": "2d3489a3aad940c9fdc9e80dcb2ddcf57749049e71e9b471972470ebf1c5c71a"
-    },
-    {
-      "source": "docs/implementation/codex-runner.md",
-      "route": "/docs/implementation/codex-runner",
-      "title": "Local Codex execution with Docker",
-      "sha256": "62e4c19c32d0e41a9061747184d8ce16690cc73fe0d4fb4ccb96800593a8ac8d"
-    },
-    {
-      "source": "docs/implementation/codex-sandboxes.md",
-      "route": "/docs/implementation/codex-sandboxes",
-      "title": "Alternative Codex sandboxes and benchmarks",
-      "sha256": "024d8c4f1d7e35b399a891a96975ec07cf51b9d4adab809a0aa5ee3da352b382"
-    },
-    {
-      "source": "docs/implementation/debugging.md",
-      "route": "/docs/implementation/debugging",
-      "title": "Debugging RepoDesk",
-      "sha256": "700502aebd8e9d7ba22cbdd4be64a9920b43958919e5d221c282d68c0eca8e41"
-    },
-    {
-      "source": "docs/implementation/github-app.md",
-      "route": "/docs/implementation/github-app",
-      "title": "GitHub App connections",
-      "sha256": "c341bce279c943d6d9b480ad53b591186b76e06913a8c77387c09f4252864df3"
-    },
-    {
-      "source": "docs/implementation/implementation-status.md",
-      "route": "/docs/implementation/implementation-status",
-      "title": "Implementation evidence",
-      "sha256": "a48141e2fe33c0224b9ddbc8441b0c3e17e078e55abb1847cd21a2fe1935d7c5"
-    },
-    {
-      "source": "docs/implementation/release-runbook.md",
-      "route": "/docs/implementation/release-runbook",
-      "title": "Release and recovery runbook",
-      "sha256": "b4ec3aee9068c1335bb5f0739b9473462244267bc2c7c08c69e065e99bcd4373"
-    },
-    {
-      "source": "docs/implementation/review-bot.md",
-      "route": "/docs/implementation/review-bot",
-      "title": "Review Bot",
-      "sha256": "386ad6fbc8c6b63002372a8a1a1142277dbd9d86868b770725d32c974245745e"
-    },
-    {
-      "source": "docs/implementation/roadmap.md",
-      "route": "/docs/implementation/roadmap",
-      "title": "Implementation roadmap",
-      "sha256": "1e68406cc552f1c1958a2203366c91f908174e6ee60ad986df0f1a4e8e581e0b"
-    },
-    {
-      "source": "docs/implementation/self-hosted-runner.md",
-      "route": "/docs/implementation/self-hosted-runner",
-      "title": "GitHub Actions runner on the VPS",
-      "sha256": "298266e4a917c53c6eaa1b322fa38b57365e6a9990e2742006dc1eac5828325c"
-    },
-    {
-      "source": "docs/implementation/setup.md",
-      "route": "/docs/implementation/setup",
-      "title": "Local setup and Docker",
-      "sha256": "f761cd2031a6f126f5b78518bb748e151fa7be4ae277288cb77bcea5d684581e"
-    },
-    {
-      "source": "docs/implementation/storage-cleanup.md",
-      "route": "/docs/implementation/storage-cleanup",
-      "title": "Automatic VPS storage cleanup",
-      "sha256": "945ef31ff5d8775861fd08238917900c7133faf8f376035b06c5ddd7672b2850"
-    },
-    {
-      "source": "docs/implementation/team-workflows-plan.md",
-      "route": "/docs/implementation/team-workflows-plan",
-      "title": "Repository reports, conversation skills and work handoffs",
-      "sha256": "3fe480e5f8eae50164a5ca01c39feba9b78f1ef0a072f4a1dc722fa50078552e"
-    },
-    {
-      "source": "docs/implementation/telegram-attachments.md",
-      "route": "/docs/implementation/telegram-attachments",
-      "title": "Telegram image and attachment input",
-      "sha256": "9ec9c9e7457c5b600a8c897155248d023ef51d620788350feadb15243af44bd8"
-    },
-    {
-      "source": "docs/implementation/telegram-feedback-plan.md",
-      "route": "/docs/implementation/telegram-feedback-plan",
-      "title": "Telegram feedback plan for the friend beta",
-      "sha256": "b02f96d3e69f8db66801a1c39ee96989b37d8e87a2b5a8364a09b69947181775"
-    },
-    {
-      "source": "docs/implementation/updates.md",
-      "route": "/docs/implementation/updates",
-      "title": "Release checks and host updates",
-      "sha256": "4f323b1774512bfd37d263e1010457b08a35c4a8ae5c85cdaf846964de123f6b"
-    },
-    {
-      "source": "docs/implementation/vps-deployment.md",
-      "route": "/docs/implementation/vps-deployment",
-      "title": "Release deployment on a custom VPS",
-      "sha256": "f48547230846ea4c221dfa62a61183637f155ddd09a20b0a42fa7e50f5ff7006"
-    },
-    {
-      "source": "docs/reference/sources.md",
-      "route": "/docs/reference/sources",
-      "title": "Source register",
-      "sha256": "ebe5029ff1e263eacce78f1460bb17839eb8267e5058d2f2c14cf3996bd73ed7"
-    },
-    {
-      "source": "docs/reference/telegram-platform.md",
-      "route": "/docs/reference/telegram-platform",
-      "title": "Telegram adaptation and platform constraints",
-      "sha256": "9305402d61cddc95e997cf972ddd74236e5f148c201ef9b2fb3b06deba2ac217"
-    },
-    {
-      "source": "docs/research/every-agent-features.md",
-      "route": "/docs/research/every-agent-features",
-      "title": "Every Agent: detailed public feature inventory",
-      "sha256": "0a922fa500d49838b99ecfc3d502af271a1bcc65fb642de36a5536c716bc7cbe"
-    },
-    {
-      "source": "docs/research/sandbox-vps-2026-10-17.md",
-      "route": "/docs/research/sandbox-vps-2026-10-17",
-      "title": "VPS sandbox verification — 2026-10-17",
-      "sha256": "ac8446bbf371c08fef6df9380c64226acde07deb541d6ffccf94d5142f5af2be"
+      "source": "docs/user/skills.md",
+      "route": "/docs/user/skills",
+      "title": "技能与可复用流程",
+      "sha256": "94a08cd2f14ea556955e0062b0aecbd4495d95394689d0570d6aa38185206068",
+      "modified": false
     },
     {
       "source": "docs/user/telegram-experience.md",
       "route": "/docs/user/telegram-experience",
-      "title": "Telegram experience",
-      "sha256": "1e5a026d80026f15ea826b1ee48e5e8f6522376520b781d1a57c7a98fd03e4ec"
+      "title": "Telegram 使用指南",
+      "sha256": "90463e077e3cf48bf70893ffb08f373da5a78a9e5ffc6c81736dacaa2ec1265a",
+      "modified": false
     },
     {
-      "source": "src/agent/SOUL.md",
-      "route": "/docs/assistant-personality",
-      "title": "RepoDesk's soul",
-      "sha256": "132df0941f0e4a3d7034c1858c8051c1b8bec6063ceb761016c5dceb04103544"
+      "source": "docs/user/troubleshooting.md",
+      "route": "/docs/user/troubleshooting",
+      "title": "常见问题与排障",
+      "sha256": "e83dcfcf6237662155265bcecac3308bebe5129a7f4da8bfe159ef80df3363a2",
+      "modified": false
+    },
+    {
+      "source": "docs/user/workflows.md",
+      "route": "/docs/user/workflows",
+      "title": "定时任务与报告",
+      "sha256": "8fbbdf230ce418387dbd97dce615b55e06e19d4c9d10c908a2e40ed6332d3457",
+      "modified": false
     }
   ]
 }

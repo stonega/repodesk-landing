@@ -3,14 +3,14 @@
 ## Product and scope
 
 This is RepoDesk's public landing page and a dedicated Codex plugin acceptance repository.
-Read README.md, docs/design/architecture.md and docs/implementation/setup.md first.
+Read README.md and docs/user/landing.md first.
 Keep illustrative conversations labeled. Do not invent customers, testimonials,
 usage statistics, security guarantees or integrations that RepoDesk does not have.
 
 ## Structure and workflow
 
 Keep one standalone React Router v7 application. Source lives in src/, tests in tests/,
-automation in scripts/, and design/setup/user guidance in docs/.
+automation in scripts/, and user guidance in docs/user/.
 Use Bun 1.3.14 for dependencies and scripts, TypeScript strict mode and Biome.
 Dependencies must be explicit and justified. Prefer small readable components.
 Preserve the minimal green RepoDesk vector mark. The admin panel's modal rules do

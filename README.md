@@ -13,8 +13,7 @@ https://51612f60.repodesk-landing.pages.dev. The PR remains open for review.
 An isolated OpenSandbox repeat also passed and produced
 [PR #3](https://github.com/stonega/repodesk-landing/pull/3), with passing CI and
 preview https://36cfc077.repodesk-landing.pages.dev.
-The fixed `baseline-v1` is unchanged. See the test protocol for separate sandbox
-results and their limits.
+The fixed `baseline-v1` is unchanged.
 
 ## Local development
 
@@ -41,20 +40,36 @@ for keyboard controls.
 
 ## Product documentation
 
-`/docs` renders the original product documentation from **stonega/repodesk** inside
-this landing application. Every Markdown document under its `docs/` directory,
-plus the assistant personality linked from the index, is checked in unchanged at a
-pinned commit. Relative documentation links stay on the site; source files and
-other repository links open that same upstream revision. Design proposals and
-research remain labeled as such; mirroring them is not a new product claim.
+`/docs` renders only the user guides from **stonega/repodesk** inside this landing
+application. The source is `../repodesk/docs/user/`; guides are copied unchanged to
+`docs/user/` and relative documentation links stay on the site. The user README is
+the documentation index; other guides keep their `/docs/user/` paths without `.md`.
+Design, implementation, reference, research and assistant personality documents
+are excluded.
 
 Builds and tests use the local snapshot and need no GitHub credentials or live API.
-See [documentation maintenance](docs/implementation/documentation.md) to refresh
-the snapshot and verify its 43 prerendered pages.
+`src/content/repodesk/manifest.json` records the source revision, hashes and routes.
+Guides with uncommitted source edits are labeled; their GitHub links show the
+upstream committed version. Run `bun scripts/verify-docs-build.tsx` after building
+to verify every prerendered guide.
 
 To preview the built site, run `bun run build && bun run preview`. The local
 static preview serves prerendered directory indexes at both `/docs` and `/docs/`,
 including deep pages. It is development/test tooling, not a production server.
+
+To refresh the [user guides](docs/user/README.md) from the sibling checkout:
+
+```sh
+bun run docs:sync
+bun run verify
+bun scripts/verify-docs-build.tsx
+bun run test:browser
+```
+
+Pass a checkout path to sync from another location: `bun run docs:sync /path/to/repodesk`.
+Refreshes update the manifest and remove previously synced guides that no longer
+exist upstream. [Landing-page guidance](docs/user/landing.md) is maintained locally
+and is not published in the product documentation navigation.
 
 ## Deployment and plugin testing
 
@@ -62,9 +77,9 @@ Cloudflare Pages connects directly to this repository: main is production, other
 branches get previews. No Cloudflare credential belongs in the application, VPS
 coding environment, or repository.
 
-- [Architecture and UI acceptance](docs/design/architecture.md)
-- [Setup and Cloudflare configuration](docs/implementation/setup.md)
-- [Live Codex task and benchmark protocol](docs/implementation/codex-test.md)
+Build command: `bun run verify`. Output: `build/client`. Root: repository root.
+Environment: `BUN_VERSION=1.3.14`, `NODE_VERSION=24` for production and previews.
+
 - [Runnable task prompt](examples/optimize-landing.txt)
 
 Agent workflow instructions are in AGENTS.md.

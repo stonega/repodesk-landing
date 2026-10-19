@@ -14,16 +14,16 @@ test("landing Docs and setup links open local documentation; Back returns home",
     .click();
   await expect(page).toHaveURL(/\/docs$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Product documentation",
+    "RepoDesk 用户文档",
   );
   await page.goBack();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Good work starts",
   );
   await page.getByRole("link", { name: "Get started", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs\/implementation\/setup$/);
+  await expect(page).toHaveURL(/\/docs\/user\/get-started$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Local setup and Docker",
+    "Get started：快速开始",
   );
 });
 
@@ -34,30 +34,30 @@ test("index preserves original documents, links, section IDs and source attribut
   page.on("pageerror", (error) => errors.push(error.message));
   const response = await page.goto("/docs");
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle("Product documentation — RepoDesk Docs");
+  await expect(page).toHaveTitle("RepoDesk 用户文档 — RepoDesk Docs");
   const article = page.getByRole("article");
-  await expect(article.getByRole("table")).toBeVisible();
+  await expect(article.getByRole("table").first()).toBeVisible();
   await expect(
-    article.getByRole("link", { name: "Assistant personality" }),
-  ).toHaveAttribute("href", "/docs/assistant-personality");
+    article.getByRole("link", { name: "Codex 开发任务" }),
+  ).toHaveAttribute("href", "/docs/user/codex");
   await expect(
     page.getByRole("link", {
       name: `View source at ${docsSnapshot.revision.slice(0, 7)}`,
     }),
   ).toHaveAttribute(
     "href",
-    `${docsSnapshot.repository}/blob/${docsSnapshot.revision}/docs/README.md`,
+    `${docsSnapshot.repository}/blob/${docsSnapshot.revision}/docs/user/README.md`,
   );
   const guide = article
-    .getByRole("link", { name: "GitHub work through Telegram", exact: true })
+    .getByRole("link", { name: "连接和使用 GitHub", exact: true })
     .first();
   await guide.click();
-  await expect(page).toHaveURL(/\/docs\/design\/github-workflows$/);
+  await expect(page).toHaveURL(/\/docs\/user\/github$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "GitHub work through Telegram",
+    "连接和使用 GitHub",
   );
-  await page.goto("/docs#evidence-vocabulary");
-  await expect(page.locator("#evidence-vocabulary")).toBeInViewport();
+  await page.goto("/docs#使用范围");
+  await expect(page.locator("#使用范围")).toBeInViewport();
   expect(errors).toEqual([]);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({
@@ -76,13 +76,10 @@ test("deep pages prerender useful content without JavaScript", async ({
   });
   const page = await context.newPage();
   for (const [path, title] of [
-    ["/docs", "Product documentation"],
-    ["/docs/implementation/setup", "Local setup and Docker"],
-    ["/docs/assistant-personality", "RepoDesk's soul"],
-    [
-      "/docs/research/sandbox-vps-2026-10-17",
-      "VPS sandbox verification — 2026-10-17",
-    ],
+    ["/docs", "RepoDesk 用户文档"],
+    ["/docs/user/get-started", "Get started：快速开始"],
+    ["/docs/user/codex", "Codex 开发任务"],
+    ["/docs/user/troubleshooting", "常见问题与排障"],
   ]) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
@@ -99,7 +96,7 @@ test("deep pages prerender useful content without JavaScript", async ({
 test("documentation navigation and skip link work with keyboard focus", async ({
   page,
 }, info) => {
-  await page.goto("/docs/implementation/setup");
+  await page.goto("/docs/user/get-started");
   await page.keyboard.press("Tab");
   const skip = page.getByRole("link", { name: "Skip to content" });
   await expect(skip).toBeFocused();
@@ -114,12 +111,12 @@ test("documentation navigation and skip link work with keyboard focus", async ({
     await page.keyboard.press("Enter");
     await expect(disclosure).toHaveAttribute("open", "");
     const current = disclosure.locator('[aria-current="page"]');
-    await expect(current).toHaveText("Local setup and Docker");
+    await expect(current).toHaveText("Get started：快速开始");
     await summary.focus();
     await page.keyboard.press("Tab");
     await expect(
       disclosure.getByRole("link", {
-        name: "Product documentation",
+        name: "RepoDesk 用户文档",
         exact: true,
       }),
     ).toBeFocused();
@@ -138,10 +135,10 @@ test("documentation navigation and skip link work with keyboard focus", async ({
   } else {
     const navigation = page.locator(".docs-sidebar");
     await expect(navigation.locator('[aria-current="page"]')).toHaveText(
-      "Local setup and Docker",
+      "Get started：快速开始",
     );
     await navigation
-      .getByRole("link", { name: "Product documentation", exact: true })
+      .getByRole("link", { name: "RepoDesk 用户文档", exact: true })
       .focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/docs$/);
@@ -174,7 +171,7 @@ test("wide content is keyboard-scrollable and reduced motion remains supported",
   page,
 }, info) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/docs/implementation/self-hosted-runner");
+  await page.goto("/docs/user/maintenance");
   expect(
     await page.evaluate(
       () => getComputedStyle(document.documentElement).scrollBehavior,

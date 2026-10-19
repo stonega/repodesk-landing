@@ -1,15 +1,17 @@
 # Landing page
 
-Get started opens the RepoDesk self-hosting guide. Source opens the product repository.
+Get started and Set up RepoDesk open the local RepoDesk user quick-start guide.
+Documentation links open the user guide index. GitHub opens the product repository.
 How it works jumps to the workflow. The mobile menu closes after selecting a section.
 FAQ rows open with click, Enter or Space.
 
 ## Documentation
 
 Docs in the header and Documentation in the footer open `/docs`. Get started and
-Set up RepoDesk open the mirrored setup guide. The original product documentation
-is shown directly, with its upstream repository and pinned source revision above
-each page. Research and proposed work are not claims of shipped functionality.
+Set up RepoDesk open `/docs/user/get-started`. Only guides from the product's
+`docs/user/` directory are published, with its README at `/docs`. Source attribution
+appears above each page; guides with uncommitted edits are labeled. GitHub source
+links show the committed upstream revision.
 
 Use the documentation sidebar on desktop. On mobile, open Browse documentation
 with click, Enter or Space, then choose a page. The current page is highlighted and
@@ -17,7 +19,7 @@ announced. Skip to content moves focus past navigation; overflowing tables and c
 keyboard-focusable and scroll horizontally without widening the page. Section
 links, direct document URLs and browser Back work without a backend. Home returns
 to the landing page. The snapshot updates only when maintainers explicitly refresh
-it; View source opens the exact upstream version being displayed.
+it; View source opens the recorded upstream version.
 
 ## Example walkthrough
 

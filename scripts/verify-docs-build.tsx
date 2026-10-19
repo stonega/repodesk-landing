@@ -6,7 +6,7 @@ import { docsSnapshot } from "../src/lib/docs";
 
 for (const document of docsSnapshot.documents) {
   const content = readFileSync(
-    new URL(`../src/content/repodesk/${document.source}`, import.meta.url),
+    new URL(`../${document.source}`, import.meta.url),
     "utf8",
   );
   const html = readFileSync(

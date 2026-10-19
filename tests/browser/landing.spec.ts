@@ -86,8 +86,17 @@ test("renders a responsive page and working setup links", async ({
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByRole("link", { name: "Get started" })).toHaveAttribute(
     "href",
-    "/docs/implementation/setup",
+    "/docs/user/get-started",
   );
+  await expect(
+    page.getByRole("link", { name: "Set up RepoDesk" }),
+  ).toHaveAttribute("href", "/docs/user/get-started");
+  for (const name of ["Read the documentation", "Documentation"]) {
+    await expect(page.getByRole("link", { name, exact: true })).toHaveAttribute(
+      "href",
+      "/docs",
+    );
+  }
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

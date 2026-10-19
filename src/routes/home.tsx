@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Walkthrough from "../components/walkthrough";
 
 export const REPO_URL = "https://github.com/stonega/repodesk";
-export const DOCS_URL = "/docs/implementation/setup";
+export const DOCS_URL = "/docs/user/get-started";
 export function meta() {
   return [
     { title: "RepoDesk — Your repositories, one conversation away." },
@@ -233,10 +233,7 @@ export default function Home() {
                 <br />
                 Keep control of what ships.
               </p>
-              <a
-                className="text-link"
-                href={`${REPO_URL}/blob/main/docs/README.md`}
-              >
+              <a className="text-link" href="/docs">
                 Read the documentation <Arrow diagonal />
               </a>
             </div>

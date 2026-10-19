@@ -5,13 +5,13 @@ import { join } from "node:path";
 import { serveBuild } from "../../scripts/preview";
 
 const directory = mkdtempSync(join(tmpdir(), "repodesk-preview-"));
-mkdirSync(join(directory, "docs", "implementation", "setup"), {
+mkdirSync(join(directory, "docs", "user", "get-started"), {
   recursive: true,
 });
 writeFileSync(join(directory, "index.html"), "<h1>Landing</h1>");
 writeFileSync(join(directory, "docs", "index.html"), "<h1>Documentation</h1>");
 writeFileSync(
-  join(directory, "docs", "implementation", "setup", "index.html"),
+  join(directory, "docs", "user", "get-started", "index.html"),
   "<h1>Setup</h1>",
 );
 writeFileSync(join(directory, "styles.css"), "body { margin: 0; }");
@@ -24,8 +24,8 @@ describe("static prerender preview", () => {
       ["/", "Landing"],
       ["/docs", "Documentation"],
       ["/docs/", "Documentation"],
-      ["/docs/implementation/setup", "Setup"],
-      ["/docs/implementation/setup/", "Setup"],
+      ["/docs/user/get-started", "Setup"],
+      ["/docs/user/get-started/", "Setup"],
     ]) {
       const response = serveBuild(
         new Request(`http://localhost${path}`),

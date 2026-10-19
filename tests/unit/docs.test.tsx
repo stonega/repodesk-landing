@@ -11,16 +11,20 @@ import {
   sourceUrl,
 } from "../../src/lib/docs";
 
-const directory = new URL("../../src/content/repodesk/", import.meta.url);
+const directory = new URL("../../", import.meta.url);
 const index = findDocument("/docs");
 if (!index) throw new Error("Missing documentation index");
 
-describe("original product documentation snapshot", () => {
-  test("pins every unchanged Markdown file and gives it a unique static route", () => {
+describe("user documentation snapshot", () => {
+  test("includes only user guides with verified hashes and unique static routes", () => {
     expect(docsSnapshot.repository).toBe("https://github.com/stonega/repodesk");
     expect(docsSnapshot.revision).toMatch(/^[a-f0-9]{40}$/);
-    const files = readdirSync(directory, { recursive: true, encoding: "utf8" })
-      .filter((path) => path.endsWith(".md"))
+    const files = readdirSync(new URL("docs/user/", directory), {
+      recursive: true,
+      encoding: "utf8",
+    })
+      .filter((path) => path.endsWith(".md") && path !== "landing.md")
+      .map((path) => `docs/user/${path}`)
       .sort();
     expect(docsSnapshot.documents.map((doc) => doc.source).sort()).toEqual(
       files,
@@ -40,20 +44,24 @@ describe("original product documentation snapshot", () => {
     }
     expect(findDocument("/docs/missing")).toBeUndefined();
     expect(findDocument("/docs/../README")).toBeUndefined();
+    expect(findDocument("/docs/implementation/setup")).toBeUndefined();
+    expect(findDocument("/docs/design/architecture")).toBeUndefined();
+    expect(findDocument("/docs/assistant-personality")).toBeUndefined();
   });
 
-  test("serves every document linked by the upstream index, including the personality", () => {
+  test("serves the user index and keeps navigation within the user guides", () => {
     const content = readFileSync(new URL(index.source, directory), "utf8");
     const links = Array.from(content.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g));
-    expect(links.length).toBeGreaterThan(40);
+    expect(links.length).toBeGreaterThan(15);
     for (const [, href] of links) {
       const route = resolveDocumentUrl(href, index.source);
       expect(findDocument(route)).toBeDefined();
     }
-    expect(resolveDocumentUrl("../src/agent/SOUL.md", index.source)).toBe(
-      "/docs/assistant-personality",
-    );
+    expect(resolveDocumentUrl("README.md", index.source)).toBe("/docs");
     const navigable = documentationGroups.flatMap((group) => group.documents);
+    expect(navigable.every((doc) => doc.source.startsWith("docs/user/"))).toBe(
+      true,
+    );
     expect(navigable.map((doc) => doc.source).sort()).toEqual(
       docsSnapshot.documents.map((doc) => doc.source).sort(),
     );
@@ -74,22 +82,22 @@ describe("original product documentation snapshot", () => {
 });
 
 describe("documentation destinations and Markdown rendering", () => {
-  const source = "docs/implementation/setup.md";
+  const source = "docs/user/get-started.md";
 
   test("resolves relative docs, root links, queries, fragments and same-repository URLs", () => {
-    expect(resolveDocumentUrl("../README.md", source)).toBe("/docs");
-    expect(
-      resolveDocumentUrl("../design/architecture.md#runtime", source),
-    ).toBe("/docs/design/architecture#runtime");
-    expect(
-      resolveDocumentUrl("./github-app.md?view=1#permissions", source),
-    ).toBe("/docs/implementation/github-app?view=1#permissions");
-    expect(resolveDocumentUrl("/docs/README.md", source)).toBe("/docs");
+    expect(resolveDocumentUrl("./README.md", source)).toBe("/docs");
+    expect(resolveDocumentUrl("./deployment.md#runtime", source)).toBe(
+      "/docs/user/deployment#runtime",
+    );
+    expect(resolveDocumentUrl("./github.md?view=1#permissions", source)).toBe(
+      "/docs/user/github?view=1#permissions",
+    );
+    expect(resolveDocumentUrl("/docs/user/README.md", source)).toBe("/docs");
     expect(resolveDocumentUrl("#docker", source)).toBe("#docker");
     expect(resolveDocumentUrl("", source)).toBe("");
     expect(
       resolveDocumentUrl(
-        "https://github.com/stonega/repodesk/blob/main/docs/README.md#evidence-vocabulary",
+        "https://github.com/stonega/repodesk/blob/main/docs/user/README.md#evidence-vocabulary",
         source,
       ),
     ).toBe("/docs#evidence-vocabulary");
@@ -115,7 +123,7 @@ describe("documentation destinations and Markdown rendering", () => {
     for (const href of [
       "https://example.com/docs?q=a#b",
       "mailto:hello@example.com",
-      "https://github.com/stonega/repodesk/blob/another-version/docs/README.md",
+      "https://github.com/stonega/repodesk/blob/another-version/docs/user/README.md",
     ]) {
       expect(resolveDocumentUrl(href, source)).toBe(href);
     }
@@ -127,7 +135,7 @@ describe("documentation destinations and Markdown rendering", () => {
 ## Permissions & scope
 ## Permissions & scope
 
-[Guide](../design/architecture.md#runtime)
+[Guide](./deployment.md#runtime)
 [Unsafe](javascript:alert%281%29)
 
 | Document | Status |
@@ -150,7 +158,7 @@ echo '<script>not executable</script>'
     );
     expect(html).toContain('id="permissions--scope"');
     expect(html).toContain('id="permissions--scope-1"');
-    expect(html).toContain('href="/docs/design/architecture#runtime"');
+    expect(html).toContain('href="/docs/user/deployment#runtime"');
     expect(html).toContain("<table>");
     expect(html).toContain("<strong>Implemented</strong>");
     expect(html).toContain('type="checkbox"');

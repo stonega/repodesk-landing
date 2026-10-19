@@ -45,14 +45,8 @@ export const documentationGroups = [
     title: "Overview",
     documents: snapshot.documents.filter((doc) => doc.route === "/docs"),
   },
-  ...["design", "implementation", "user", "reference", "research"].map(
-    (group) => ({
-      title: group.charAt(0).toUpperCase() + group.slice(1),
-      documents: snapshot.documents.filter(
-        (doc) =>
-          doc.source.startsWith(`docs/${group}/`) ||
-          (group === "reference" && doc.source === "src/agent/SOUL.md"),
-      ),
-    }),
-  ),
+  {
+    title: "User guides",
+    documents: snapshot.documents.filter((doc) => doc.route !== "/docs"),
+  },
 ];
