@@ -1,120 +1,128 @@
 import { useRef, useState } from "react";
+import { scenarios } from "../content/walkthrough";
+import ScenarioPanel from "./scenario-panel";
 
-export const scenarios = [
-  {
-    id: "questions",
-    label: "Code Q&A",
-    request:
-      "Where does this app decide which repositories a workspace can use?",
-    reply:
-      "In this example, I’d trace the permission checks and explain how repository access is scoped.",
-    status: "Read-only explanation",
-    detail: "No code changes requested",
-    resultLabel: "EXAMPLE ANSWER",
-    resultTitle: "Follow the repository access checks",
-    resultBody:
-      "Start with workspace membership, then check the connected repositories and GitHub permissions.",
-  },
-  {
-    id: "fix",
-    label: "Fix an issue",
-    request:
-      "The signup page feels cramped on mobile. Can you improve the spacing?",
-    reply:
-      "In this example, I’d inspect the layout, adjust the mobile spacing, and run the project checks.",
-    status: "Proposed layout fix",
-    detail: "Checks and changes would accompany the PR",
-    resultLabel: "EXAMPLE PULL REQUEST",
-    resultTitle: "Improve the mobile signup layout",
-    resultBody:
-      "A focused spacing change for you to inspect. Review and merging remain separate actions.",
-  },
-  {
-    id: "review",
-    label: "PR review",
-    request:
-      "Review the proposed mobile signup changes. Are there any layout risks?",
-    reply:
-      "In this example, I’d read the diff and flag narrow-screen issues for a maintainer to consider.",
-    status: "Review notes for a maintainer",
-    detail: "No approval or merge implied",
-    resultLabel: "EXAMPLE REVIEW",
-    resultTitle: "Check the form at narrow widths",
-    resultBody:
-      "Suggested follow-up: check that input labels wrap and the submit button stays within the viewport.",
-  },
-] as const;
-
-export default function Walkthrough() {
-  const [selected, setSelected] = useState(1);
+function ScenarioTabs({
+  selected,
+  onSelect,
+}: {
+  selected: number;
+  onSelect: (index: number) => void;
+}) {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
 
   function selectTab(index: number) {
-    setSelected(index);
+    onSelect(index);
     tabs.current[index]?.focus();
   }
 
   return (
+    <div
+      className="scenario-tabs"
+      role="tablist"
+      aria-label="Example scenarios"
+    >
+      {scenarios.map((scenario, index) => (
+        <button
+          key={scenario.id}
+          ref={(element) => {
+            tabs.current[index] = element;
+          }}
+          id={`scenario-tab-${scenario.id}`}
+          type="button"
+          role="tab"
+          aria-selected={selected === index}
+          aria-controls={`scenario-panel-${scenario.id}`}
+          tabIndex={selected === index ? 0 : -1}
+          onClick={() => onSelect(index)}
+          onKeyDown={(event) => {
+            let next: number;
+            switch (event.key) {
+              case "ArrowRight":
+                next = (index + 1) % scenarios.length;
+                break;
+              case "ArrowLeft":
+                next = (index + scenarios.length - 1) % scenarios.length;
+                break;
+              case "Home":
+                next = 0;
+                break;
+              case "End":
+                next = scenarios.length - 1;
+                break;
+              default:
+                return;
+            }
+            event.preventDefault();
+            selectTab(next);
+          }}
+        >
+          {scenario.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export default function Walkthrough() {
+  const [selected, setSelected] = useState(1);
+
+  return (
     <div className="conversation-scene">
+      <div className="scene-doodle" aria-hidden="true">
+        <svg
+          width="76"
+          height="52"
+          viewBox="0 0 76 52"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M3 43Q31 43 49 17M35 18l17-9-1 19M62 5v10m-5-5h10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span>A little message. A next step.</span>
+      </div>
       <div className="scene-label">
         <span>THREE WAYS TO START</span>
-        <span aria-hidden="true">↙</span>
+        <span>INTERACTIVE EXAMPLE</span>
       </div>
       <div className="chat-window">
         <div className="chat-header">
           <img src="/repodesk-mark.svg" width="38" height="38" alt="" />
           <div>
             <strong>RepoDesk</strong>
-            <span>Your repository, in the loop</span>
+            <span>Telegram · repository assistant</span>
           </div>
-          <span className="chat-dots" aria-hidden="true">
-            ···
-          </span>
+          <span className="bot-label">BOT</span>
         </div>
-        <div
-          className="scenario-tabs"
-          role="tablist"
-          aria-label="Example scenarios"
-        >
-          {scenarios.map((scenario, index) => (
-            <button
-              key={scenario.id}
-              ref={(element) => {
-                tabs.current[index] = element;
-              }}
-              id={`scenario-tab-${scenario.id}`}
-              type="button"
-              role="tab"
-              aria-selected={selected === index}
-              aria-controls={`scenario-panel-${scenario.id}`}
-              tabIndex={selected === index ? 0 : -1}
-              onClick={() => setSelected(index)}
-              onKeyDown={(event) => {
-                let next: number;
-                switch (event.key) {
-                  case "ArrowRight":
-                    next = (index + 1) % scenarios.length;
-                    break;
-                  case "ArrowLeft":
-                    next = (index + scenarios.length - 1) % scenarios.length;
-                    break;
-                  case "Home":
-                    next = 0;
-                    break;
-                  case "End":
-                    next = scenarios.length - 1;
-                    break;
-                  default:
-                    return;
-                }
-                event.preventDefault();
-                selectTab(next);
-              }}
-            >
-              {scenario.label}
-            </button>
-          ))}
+        <div className="repository-context">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <circle cx="6" cy="5" r="3" />
+            <circle cx="6" cy="19" r="3" />
+            <circle cx="18" cy="5" r="3" />
+            <path d="M6 8v8m12-8v3a4 4 0 0 1-4 4H6" />
+          </svg>
+          <div>
+            <span>EXAMPLE REPOSITORY</span>
+            <strong>example/site</strong>
+          </div>
+          <span className="repository-scope">Selected repo</span>
         </div>
+        <ScenarioTabs selected={selected} onSelect={setSelected} />
         <div className="chat-body">
           <p className="chat-date">ILLUSTRATIVE CONVERSATION</p>
           <p className="example-notice">
@@ -122,49 +130,16 @@ export default function Walkthrough() {
           </p>
           <div className="scenario-panels">
             {scenarios.map((scenario, index) => (
-              <div
+              <ScenarioPanel
                 key={scenario.id}
-                id={`scenario-panel-${scenario.id}`}
-                role="tabpanel"
-                aria-labelledby={`scenario-tab-${scenario.id}`}
-                aria-hidden={selected !== index}
-                inert={selected !== index}
-                tabIndex={selected === index ? 0 : -1}
-                className="scenario-panel"
-              >
-                <div className="message outgoing">
-                  <strong>Example request</strong>
-                  {scenario.request}
-                </div>
-                <div className="message incoming">
-                  <strong>RepoDesk · example response</strong>
-                  {scenario.reply}
-                </div>
-                <div className="task-progress">
-                  <span className="check-circle" aria-hidden="true">
-                    ↳
-                  </span>
-                  <div>
-                    <strong>{scenario.status}</strong>
-                    <span>{scenario.detail}</span>
-                  </div>
-                </div>
-                <div className="pr-preview">
-                  <span className="pr-icon" aria-hidden="true">
-                    ⑂
-                  </span>
-                  <div>
-                    <span>{scenario.resultLabel}</span>
-                    <strong>{scenario.resultTitle}</strong>
-                    <small>{scenario.resultBody}</small>
-                  </div>
-                </div>
-              </div>
+                scenario={scenario}
+                active={selected === index}
+              />
             ))}
           </div>
         </div>
-        <div className="chat-compose" aria-hidden="true">
-          A little less back-and-forth.<span>↗</span>
+        <div className="chat-compose">
+          <span>Preview only · no messages are sent</span>
         </div>
       </div>
       <div className="scene-footnote">

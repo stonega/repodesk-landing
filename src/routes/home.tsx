@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { Arrow, SiteFooter, SiteHeader } from "../components/site-chrome";
 import Walkthrough from "../components/walkthrough";
 import WorkflowDiagram from "../components/workflow-diagram";
+import WorkflowIllustration, {
+  type WorkflowStory,
+} from "../components/workflow-illustration";
+import { DOCS_URL } from "../lib/site";
 
-export const REPO_URL = "https://github.com/stonega/repodesk";
-export const DOCS_URL = "/docs/user/get-started";
 export function meta() {
   return [
     { title: "RepoDesk — Your repositories, one conversation away." },
@@ -23,63 +25,27 @@ export function meta() {
     { property: "og:type", content: "website" },
   ];
 }
-function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} />
-    </svg>
-  );
-}
-function GitHubIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M12 .297C5.37.297 0 5.67 0 12.297c0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.043-1.61-4.043-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.467-1.334-5.467-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.536-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.52 11.52 0 0 1 12 6.097c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.655 1.652.243 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.628-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.29 0 .322.216.694.825.576C20.565 22.092 24 17.594 24 12.297c0-6.627-5.373-12-12-12" />
-    </svg>
-  );
-}
-function GitHubLink() {
-  return (
-    <a href={REPO_URL} className="github-link">
-      GitHub <GitHubIcon />
-    </a>
-  );
-}
-function Mark() {
-  return (
-    <span className="wordmark">
-      <img src="/repodesk-mark.svg" width="32" height="32" alt="" />
-      RepoDesk
-    </span>
-  );
-}
-const steps = [
+const steps: {
+  number: string;
+  story: WorkflowStory;
+  title: string;
+  body: string;
+}[] = [
   {
     number: "01",
+    story: "connect",
     title: "Connect your repository.",
     body: "Install your GitHub App and choose the repositories your workspace can use. Access stays explicit.",
   },
   {
     number: "02",
+    story: "conversation",
     title: "Give the work some context.",
     body: "Describe a fix or feature in Telegram. RepoDesk keeps the request, questions, and progress in the conversation.",
   },
   {
     number: "03",
+    story: "review",
     title: "Come back to a pull request.",
     body: "Codex works in an isolated environment, runs repository checks, and returns a PR for your review.",
   },
@@ -108,46 +74,18 @@ const faqs = [
 ];
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => {
-    const close = () => setMenuOpen(false);
-    window.addEventListener("hashchange", close);
-    return () => window.removeEventListener("hashchange", close);
-  }, []);
   return (
     <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="site-header wrap">
-        <a href="/" aria-label="RepoDesk home">
-          <Mark />
-        </a>
-        <button
-          className="menu-button"
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="site-nav"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? "Close" : "Menu"}
-        </button>
-        <nav
-          id="site-nav"
-          aria-label="Main navigation"
-          className={menuOpen ? "nav open" : "nav"}
-        >
-          <a href="#workflow">How it works</a>
-          <a href="#principles">Built for your team</a>
-          <a href="/docs">Docs</a>
-          <GitHubLink />
-        </nav>
-      </header>
+      <SiteHeader />
       <main id="main">
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">
-              <span className="status-dot" /> YOUR CODE. YOUR CONVERSATION.
+              <span className="status-dot" aria-hidden="true" /> YOUR CODE. YOUR
+              CONVERSATION.
             </p>
             <h1 id="hero-title">
               Good work starts
@@ -208,10 +146,13 @@ export default function Home() {
           </div>
           <div className="steps">
             {steps.map((step) => (
-              <article className="step" key={step.number}>
-                <span className="step-number">{step.number}</span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
+              <article className={`step step-${step.story}`} key={step.number}>
+                <WorkflowIllustration story={step.story} />
+                <div className="step-copy">
+                  <span className="step-number">{step.number}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
               </article>
             ))}
           </div>
@@ -308,18 +249,7 @@ export default function Home() {
           </a>
         </section>
       </main>
-      <footer className="site-footer wrap">
-        <a href="/" aria-label="RepoDesk home">
-          <Mark />
-        </a>
-        <p>From conversation to contribution.</p>
-        <div>
-          <GitHubLink />
-          <a href="/docs">
-            Documentation <Arrow diagonal />
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
