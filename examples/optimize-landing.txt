@@ -1,10 +1,12 @@
-请使用 Codex 优化 stonega/repodesk-landing 的 landing page，并创建一个待 review 的 PR。
+请使用 Codex 重构 stonega/repodesk-landing 的 landing page，准备待 review 的变更说明；由应用服务负责发布，不要自行创建 PR、推送、合并或部署。
 
-目标：让访客能更直观地理解 RepoDesk 的三个典型使用场景。在现有 Telegram 示例区域增加可切换的“代码问答 / 修复问题 / PR review”演示，每个场景展示不同的示例请求和结果。保持英文页面文案、现有绿色品牌和简洁排版，明确标注这些是示例，不要虚构客户、统计数字或真实执行结果。
+目标：让 Telegram 风格的示例更接近真实使用体验，并拆分页面导航、场景内容和结果卡片。保留可切换的“代码问答 / 修复问题 / PR review”演示，分别显示示例访问检查路径、CSS diff 和 review checklist。仓库、文件和结果必须明确标注为示例；不连接真实服务、不添加假的在线状态、检查成功记录、输入框或发送按钮。保持英文页面文案、现有绿色矢量品牌和简洁排版，不要虚构客户、统计数字或产品能力。
+
+视觉目标：参考 https://telegram.org/ 的插画叙事和轻松友好的感觉，让界面更活泼，而不是单纯增加动画。使用更明亮的绿色、圆润卡片、本地 SVG 流程插画和清晰易读的字体；保留 RepoDesk 自己的品牌，不复制 Telegram 标志、文案或产品承诺。插画只作静态装饰，屏幕阅读器读取相邻的流程标题与说明。
 
 验收：
 1. 场景切换支持键盘和屏幕阅读器，选中状态清晰；默认场景合理，切换不会引起明显布局跳动。
-2. 390px 手机和 1440px 桌面可正常使用，无横向溢出；保留移动导航、FAQ 和 Get started 链接。
+2. 390px 手机和 1440px 桌面可正常使用，无横向溢出；保留移动导航、FAQ、文档和 Get started 链接。移动导航再次选择当前锚点时也应关闭；Escape 关闭菜单并恢复 toggle 焦点。
 3. 遵循 reduced motion，避免引入额外 UI 或动画依赖。
-4. 更新确定性的组件/浏览器测试和相关说明，运行 AGENTS.md 的 check、typecheck、test 和 build；有浏览器时验证交互。
-5. 不修改 AGENTS.md、部署/CI 配置，不读取或添加账号凭据。完成后创建 PR，给出改进说明、检查结果和预览链接；不合并 PR。
+4. 更新确定性的组件/浏览器测试和相关说明；验证无 JavaScript 时的默认示例、放大文字和窄屏布局。使用 Bun 1.3.14，运行 bun install --frozen-lockfile、bun run check、bun run typecheck、bun test、bun run build、bun scripts/verify-docs-build.tsx 和 bash scripts/verify-browser.sh。浏览器脚本负责安装 Chromium 并准备缺失的 Linux 库。
+5. 不修改 AGENTS.md、部署/CI 配置，不读取或添加账号凭据，不拉取或同步其他仓库。完成后给出改进说明、检查结果和限制；不要声称已经创建 PR 或发布预览。

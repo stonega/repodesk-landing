@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import Home, { DOCS_URL, meta, REPO_URL } from "../../src/routes/home";
+import { DOCS_URL, REPO_URL } from "../../src/lib/site";
+import Home, { meta } from "../../src/routes/home";
 
 describe("public landing page contract", () => {
   test("shares matching GitHub links and decorative brand icons across header and footer", () => {
@@ -43,5 +44,25 @@ describe("public landing page contract", () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html.match(/<details>/g)).toHaveLength(4);
     expect(html).toContain('href="#main"');
+  });
+  test("pairs each workflow step with a local, decorative illustration", () => {
+    const html = renderToStaticMarkup(<Home />);
+    const stories = ["connect", "conversation", "review"];
+    const illustrations = Array.from(
+      html.matchAll(/<svg class="workflow-illustration[^>]*>/g),
+      (match) => match[0],
+    );
+    expect(illustrations).toHaveLength(stories.length);
+    for (const [index, story] of stories.entries()) {
+      expect(illustrations[index]).toContain(`story-${story}`);
+      expect(illustrations[index]).toContain('aria-hidden="true"');
+      expect(illustrations[index]).toContain('focusable="false"');
+      expect(html).toContain(`class="step step-${story}"`);
+    }
+    expect(html).toContain("Connect your repository.");
+    expect(html).toContain("Give the work some context.");
+    expect(html).toContain("Come back to a pull request.");
+    expect(html).not.toContain("<video");
+    expect(html).not.toContain("fonts.googleapis.com");
   });
 });

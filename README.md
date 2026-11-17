@@ -26,9 +26,11 @@ bun run dev
 
 ```sh
 bun run verify
-bunx playwright install chromium
-bun run test:browser
+bash scripts/verify-browser.sh
 ```
+
+The browser script installs Chromium, prepares missing Linux libraries locally
+when needed, and runs `bun run test:browser` without GitHub or model credentials.
 
 React Router v7 prerenders the page into `build/client`. Tailwind v4 provides the
 CSS entry point, with page-specific design tokens and styles; no UI kit is needed.
@@ -37,6 +39,13 @@ mobile/desktop navigation, overflow, disclosures, setup destinations, reduced mo
 and the accessible Code Q&A / Fix an issue / PR review example tabs. The walkthrough
 contains sample outcomes only, not live task results. See [page guidance](docs/user/landing.md)
 for keyboard controls.
+The repository-scoped preview includes a sample access trace, CSS diff and review
+checklist. It does not connect to Telegram or GitHub or accept messages. Scenario
+content, accessible tabs, outcome cards and shared site navigation are maintained
+separately so the marketing page stays easy to change without implying a live app.
+The brighter, illustration-led design uses local decorative SVG stories, rounded
+cards and system fonts. It preserves the green vector mark and adds no dependencies
+or external asset requests. See the visual storytelling section in the page guidance.
 
 ## Product documentation
 

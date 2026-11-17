@@ -8,6 +8,7 @@ const examples = [
       "Where does this app decide which repositories a workspace can use?",
     resultLabel: "EXAMPLE ANSWER",
     title: "Follow the repository access checks",
+    artifact: "Sample access trace",
   },
   {
     label: "Fix an issue",
@@ -16,6 +17,7 @@ const examples = [
       "The signup page feels cramped on mobile. Can you improve the spacing?",
     resultLabel: "EXAMPLE PULL REQUEST",
     title: "Improve the mobile signup layout",
+    artifact: "Sample diff · src/signup.css",
   },
   {
     label: "PR review",
@@ -24,6 +26,7 @@ const examples = [
       "Review the proposed mobile signup changes. Are there any layout risks?",
     resultLabel: "EXAMPLE REVIEW",
     title: "Check the form at narrow widths",
+    artifact: "Sample review checklist",
   },
 ];
 
@@ -41,6 +44,16 @@ test("switches distinct examples without overflow or layout jumps", async ({
   await expect(
     page.getByRole("tabpanel", { name: "Fix an issue", exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText("EXAMPLE REPOSITORY", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("example/site", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Preview only · no messages are sent", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".chat-window input, .chat-window textarea, .chat-window a"),
+  ).toHaveCount(0);
   await expect(
     page.getByText(
       "Sample requests and outcomes — not live execution results.",
@@ -79,6 +92,25 @@ test("switches distinct examples without overflow or layout jumps", async ({
       panel.getByText(example.resultLabel, { exact: true }),
     ).toBeVisible();
     await expect(panel.getByText(example.title, { exact: true })).toBeVisible();
+    await expect(panel.locator("figcaption")).toHaveText(example.artifact);
+    const artifact = panel.locator(".example-artifact");
+    expect(
+      await artifact.evaluate(
+        (element) => element.scrollWidth <= element.clientWidth,
+      ),
+    ).toBe(true);
+    if (example.id === "fix") {
+      await expect(artifact.locator(".diff-remove")).toContainText(
+        "- padding: 8px;",
+      );
+      await expect(artifact.locator(".diff-add")).toContainText(
+        "+ padding: 24px 16px;",
+      );
+    } else {
+      await expect(artifact.getByRole("listitem")).toHaveCount(
+        example.id === "questions" ? 3 : 2,
+      );
+    }
     for (const other of examples.filter((item) => item.id !== example.id)) {
       const inactive = page.locator(`#scenario-panel-${other.id}`);
       await expect(inactive).toBeHidden();
@@ -101,6 +133,66 @@ test("switches distinct examples without overflow or layout jumps", async ({
     });
   }
   expect(errors).toEqual([]);
+});
+
+test("keeps the preview readable with enlarged text and tablet layouts", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator(".conversation-scene").evaluate((scene) => {
+    const sizes = [scene, ...scene.querySelectorAll<HTMLElement>("*")].map(
+      (element) => ({
+        element,
+        fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+      }),
+    );
+    for (const { element, fontSize } of sizes) {
+      (element as HTMLElement).style.fontSize = `${fontSize * 1.5}px`;
+    }
+  });
+  for (const width of [390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const example of examples) {
+      await page.getByRole("tab", { name: example.label, exact: true }).click();
+      const artifact = page.getByRole("tabpanel").locator(".example-artifact");
+      await expect(artifact.locator("figcaption")).toBeVisible();
+      expect(
+        await artifact.evaluate(
+          (element) => element.scrollWidth <= element.clientWidth,
+        ),
+      ).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  }
+});
+
+test.describe("prerendered preview", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("shows the default sample and its boundaries without JavaScript", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const panel = page.getByRole("tabpanel", {
+      name: "Fix an issue",
+      exact: true,
+    });
+    await expect(panel).toBeVisible();
+    await expect(panel.locator("figcaption")).toHaveText(
+      "Sample diff · src/signup.css",
+    );
+    await expect(page.getByRole("tabpanel")).toHaveCount(1);
+    await expect(
+      page.getByText("Preview only · no messages are sent", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Get started", exact: true }),
+    ).toHaveAttribute("href", "/docs/user/get-started");
+  });
 });
 
 test("supports roving focus, wrapping arrows, Home, End and panel keyboard access", async ({

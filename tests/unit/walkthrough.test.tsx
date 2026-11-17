@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import Walkthrough, { scenarios } from "../../src/components/walkthrough";
+import ScenarioPanel from "../../src/components/scenario-panel";
+import Walkthrough from "../../src/components/walkthrough";
+import { scenarios } from "../../src/content/walkthrough";
 
 describe("illustrative scenario walkthrough", () => {
   test("prerenders three distinct requests and outcomes without live claims", () => {
@@ -25,6 +27,34 @@ describe("illustrative scenario walkthrough", () => {
     expect(html).not.toContain("Repository checks passed");
     expect(html).not.toContain("<a ");
     expect(html).not.toContain("<form");
+    expect(html).not.toContain("<input");
+    expect(html).not.toContain("<textarea");
+    expect(html).toContain("EXAMPLE REPOSITORY");
+    expect(html).toContain("example/site");
+    expect(html).toContain("Preview only · no messages are sent");
+  });
+
+  test("renders a distinct, explicitly labeled artifact for each scenario", () => {
+    for (const scenario of scenarios) {
+      const html = renderToStaticMarkup(
+        <ScenarioPanel scenario={scenario} active />,
+      );
+      expect(html).toContain(
+        `<figcaption>${scenario.preview.label}</figcaption>`,
+      );
+      for (const line of scenario.preview.lines) {
+        expect(html).toContain(renderToStaticMarkup(line));
+      }
+      if (scenario.preview.kind === "diff") {
+        expect(html).toContain('<span class="diff-remove">- padding: 8px;');
+        expect(html).toContain('<span class="diff-add">+ padding: 24px 16px;');
+        expect(html).toContain("<pre><code>");
+      } else {
+        expect(html).toContain(
+          scenario.preview.kind === "trace" ? "<ol>" : "<ul>",
+        );
+      }
+    }
   });
 
   test("links each tab and panel and keeps only the default fix in the tab order", () => {

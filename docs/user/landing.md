@@ -3,7 +3,25 @@
 Get started and Set up RepoDesk open the local RepoDesk user quick-start guide.
 Documentation links open the user guide index. GitHub opens the product repository.
 How it works jumps to the workflow. The mobile menu closes after selecting a section.
+It also closes when selecting the current section again. Escape dismisses an open
+mobile menu and returns keyboard focus to its toggle.
 FAQ rows open with click, Enter or Space.
+
+## Visual storytelling
+
+The page uses a brighter green palette, rounded conversation cards and three local
+SVG illustrations to explain connecting a repository, giving a task context and
+reviewing a pull request. Inspired by Telegram's approachable, illustration-led
+homepage, the design keeps RepoDesk's own minimal green mark and product copy.
+The illustrations and hand-drawn hero accent are decorative, static and hidden
+from assistive technology; the adjacent headings explain every step without them.
+Cards form a row on desktop and a single column on mobile. No external fonts,
+image services, animation libraries or new dependencies are required.
+
+The conversation remains an interactive **example**, not a live application. The
+visual refresh does not add fake status indicators, message submission or product
+claims. Button and link feedback respects reduced motion; the existing workflow
+diagram retains its pause control and system-preference support.
 
 ## Documentation
 
@@ -26,6 +44,11 @@ it; View source opens the recorded upstream version.
 The Telegram-style preview offers Code Q&A, Fix an issue (the default), and PR review.
 Each shows a different sample request, response and outcome. All are illustrative:
 the preview does not submit tasks, run checks, approve reviews or show real results.
+The header names an explicitly fictional `example/site` repository. The three
+outcome cards contain a sample access trace, a sample CSS diff and a sample review
+checklist respectively. These are illustrative artifacts, not files or findings
+retrieved from a connected repository. The preview-only footer is informational,
+not a message input or send action.
 
 Click or tap a scenario to switch. With a keyboard, Tab reaches the selected tab;
 Left/Right arrows select the previous/next scenario and wrap at either end. Home
@@ -37,6 +60,13 @@ The panels share a grid footprint sized to the longest example, avoiding layout
 jumps without clipping text. The selected tab has an underline as well as a green
 background. The panels do not animate or require an extra UI dependency; reduced
 motion remains supported. Local deterministic tests require no model, Telegram or GitHub access.
+Without JavaScript, the default Fix an issue example and its sample diff remain
+readable; scenario switching requires JavaScript.
+
+Scenario copy and sample artifacts live in `src/content/walkthrough.ts`. The tab
+controller and panel rendering are separate components; shared header/footer
+navigation lives in `src/components/site-chrome.tsx`. Keep future examples labeled
+and avoid adding fake live statuses or nonfunctional app controls.
 
 ## Animated workflow diagram
 

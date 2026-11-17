@@ -151,3 +151,104 @@ test("reduced motion disables smooth scrolling", async ({ page }) => {
     ),
   ).toBe("auto");
 });
+
+test("illustrated workflow stays readable, static and inside its cards", async ({
+  page,
+}, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const cards = page.locator(".steps .step");
+  await expect(cards).toHaveCount(3);
+  for (const card of await cards.all()) {
+    const art = card.locator(".workflow-illustration");
+    await expect(art).toBeVisible();
+    await expect(art).toHaveAttribute("aria-hidden", "true");
+    await expect(art).toHaveAttribute("focusable", "false");
+    await expect(card.getByRole("heading", { level: 3 })).toBeVisible();
+    expect(
+      await card.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return [...element.querySelectorAll("svg, .step-copy")].every(
+          (child) => {
+            const childBounds = child.getBoundingClientRect();
+            return (
+              childBounds.left >= bounds.left &&
+              childBounds.right <= bounds.right &&
+              childBounds.bottom <= bounds.bottom
+            );
+          },
+        );
+      }),
+    ).toBe(true);
+  }
+  expect(
+    await page
+      .locator(".steps")
+      .evaluate((element) => element.getAnimations({ subtree: true }).length),
+  ).toBe(0);
+  const positions = await cards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const bounds = element.getBoundingClientRect();
+      return { x: bounds.x, y: bounds.y };
+    }),
+  );
+  if (info.project.name === "mobile") {
+    expect(positions[0].x).toBe(positions[1].x);
+    expect(positions[1].y).toBeGreaterThan(positions[0].y);
+  } else {
+    expect(positions[0].y).toBe(positions[1].y);
+    expect(positions[1].x).toBeGreaterThan(positions[0].x);
+  }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .locator(".steps")
+    .screenshot({ path: info.outputPath("workflow-stories.png") });
+});
+
+test("decorative accents never widen the viewport, including with disclosures open", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const summary of await page.locator("summary").all()) {
+    await summary.click();
+  }
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(await page.evaluate(() => innerWidth)).toBe(width);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(width);
+  }
+});
+
+test("mobile navigation dismisses with Escape and repeated section links", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "mobile");
+  await page.goto("/#workflow");
+  const menu = page.getByRole("button", { name: "Menu", exact: true });
+  await menu.click();
+  await page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "How it works" })
+    .focus();
+  await page.keyboard.press("Escape");
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(menu).toBeFocused();
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toBeHidden();
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await menu.click();
+    await page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "How it works" })
+      .click();
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(page).toHaveURL(/#workflow$/);
+  }
+});
