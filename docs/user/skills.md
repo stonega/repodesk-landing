@@ -1,51 +1,116 @@
-# 技能与可复用流程
+# Skills
 
-技能保存可重复使用的说明、步骤和输出格式，例如团队周报或 Issue 整理流程。技能不会自动增加仓库权限、安装外部程序或提供任意 shell 能力。
+Skills are reusable instructions, such as a team recap or issue triage procedure.
+They can request existing tools, but cannot grant repository access, install
+programs or provide arbitrary shell execution. **Skills** manages instructions;
+**Plugins** manages connected services and executable tools.
 
-**Skills** 管理指令；**Plugins** 管理连接服务和可执行工具。导入一份技能，不等于安装它描述的全部工具。
+To build a custom executable tool, see [Plugin development](plugin-development.md).
 
-## 使用预设技能
+## Manage skills on GitHub
 
-在 **Skills** 查看带 **Preset** 标记的技能，如 **Team recap** 和 **Follow-up draft**。预设可以查看说明、启用或停用，不提供编辑、发布、归档和版本回滚。
+We recommend keeping your skill instructions, reviews and version history in
+GitHub. In **Skills**, choose **Import skill**, paste a repository, folder or
+`SKILL.md` link, then choose **Find skills**. GitHub is the default import source.
+Private repositories require the current workspace's GitHub connection and access.
 
-需要不同规则时，新建自定义技能。停用技能可能挂起依赖它的定时任务。
+Select the skills to import. Click a skill's name to inspect its instructions,
+source path, metadata, supporting files or any reason it cannot be imported.
+Closing the details keeps your selection. Choose **Import skills**, then enable
+saved skills when you are ready to use them. There is no separate publish step.
 
-## 创建自定义技能
+Imported cards include a **Source** link. Make changes in GitHub, then
+choose **Check for updates** in Telo. Review the saved and incoming instructions
+and choose **Apply update**. If the skill has local edits, explicitly confirm their
+replacement. Applying an update preserves whether the skill is enabled.
 
-管理员在 **Skills** 创建技能，填写用途、指令、所需工具和设置：
+To restore earlier instructions, restore them in GitHub, then review and apply that
+source update here. Telo does not offer version selectors or rollback controls
+in the panel. Updates are manual; changes in GitHub do not sync automatically.
 
-1. 清楚描述何时使用、需要什么输入、如何判断完成。
-2. 只选择必要且已可用的工具。
-3. 保存草稿，检查指令和预览。
-4. 使用 **Test draft policy** 检查策略和提示预览。
-5. 点击 **Publish draft** 发布版本，再启用。
+## Preset and custom skills
 
-Test 不进行付费模型调用，也不会验证真实模型效果或向 Telegram 发布消息。发布和启用是两个动作，未发布的自定义草稿不能启用。
+**Team recap**, **Follow-up draft** and **Telegram widgets** are read-only presets. Inspect their
+instructions and enable or disable them. Create a separate custom skill if you
+need different rules.
 
-## 导入技能
+The default-enabled [Telegram widgets](widgets.md) preset creates compact local
+interactions in private chats and Topics. It cannot grant service access or
+authorize external actions.
 
-可以导入 Markdown 文件，也可以输入 GitHub 仓库或目录链接，发现并选择其中的 `SKILL.md`。私有来源需要通过当前工作区 GitHub 连接和权限检查。
+For a custom skill, choose **New**, describe its purpose and instructions, select
+only the necessary tools and configure its output settings. Choose **Save skill**.
+The saved instructions are immediately ready to enable. **Edit** opens a dialog;
+saving changes to an enabled skill makes them available to future runs.
 
-导入后审阅内容、设置和工具依赖，再发布启用。不要把远端技能当作可信权限来源；其中描述的凭据、安装步骤或工具名称不会自动获得执行权限。
+You can also import a standalone Markdown file. It includes only that file; use
+GitHub import when the skill needs supporting guides. GitHub remains the recommended
+place to maintain shared instructions and their history.
 
-单份导入文件需为 UTF-8 Markdown，最多 16 KB。GitHub 导入只处理选定的 `SKILL.md`，不导入配套脚本、引用文件或压缩包；依赖这些文件的技能需要先调整为当前可用工具支持的流程。
+## Files and access
 
-有来源更新时，先查看变更并生成、审阅新版本。已运行任务和定时任务固定的旧版本不会仅因源文件变化而被改写。
+A `SKILL.md` must be UTF-8 Markdown, at most 16 KB. YAML frontmatter supports
+`name`, `description`, `allowed-tools`, `license`, `compatibility` and `metadata`,
+including comments, quotes and multiline descriptions. Names allow 64 characters
+and descriptions allow 1,024 characters. Metadata values must be strings.
+Requested tools must already exist in Telo.
 
-## 从对话保存团队流程
+GitHub imports include linked `.md` and `.txt` guides inside the skill directory,
+including guides referenced by other included guides. Limits are 32 supporting
+files, 64 KB per file and 256 KB combined. Missing guides, secrets or oversized
+content block import with an explanation. Scripts and archives are not installed
+or executed; external links and paths outside the skill directory are not fetched.
 
-一次有用的对话完成后，可以说：
+Supporting files are saved from the same source commit as the instructions. They
+appear in import details, saved previews and update comparisons. The assistant
+reads them only through the existing workspace, actor, run and tool permissions.
+An imported instruction's credentials or tool declarations never grant access.
 
-> 把刚才整理 PR 报告的步骤保存成团队技能，去掉这次的私有数据。
+## Global and project-specific skills
 
-机器人会从你有权使用的已完成对话生成去敏后的完整草稿，展示给你确认。批准后，它进入管理员可见的目录，初始为未发布、未启用。
+Every custom and auto-extracted skill has a **Scope** and **Applies to** setting:
 
-这是将流程分享给管理员审阅，确认前检查是否包含不应共享的内容。不能从别人的私聊创建团队技能；群组来源也受原 Topic 范围约束。
+- **Global (all projects):** Reusable across every chat, workflow, and repository
+  (for example, weekly recap templates or triage frameworks).
+- **Project-specific:** Bound to one connected GitHub repository. Only available
+  when working with that repository—in repository-bound groups, chats targeting that
+  repository, Codex tasks, and Review Bot runs—and only for members who currently
+  have read access to it.
+- **Applies to:** Choose whether the skill is used in **Chat & workflows**,
+  **Coding & reviews** (injected automatically into Codex and Review Bot cold-start
+  context), or **All (chat & coding)**.
 
-## 版本和停用
+In **Skills**, use the scope filter alongside search and state filters to browse
+global skills or focus on a specific project repository. You can reclassify a skill
+between Global and Project-specific anytime from its **Edit** dialog.
 
-自定义技能发布不可变版本，运行和定时任务会记录所用版本。新版本不会重写历史执行；回滚选择已有发布版本，仍需核对依赖任务。归档保留历史引用，不继续作为可启用技能。
+## Autonomous skill extraction
 
-未发布、由对话生成的草稿依赖原始来源；来源被删除或过期可能使其失效。管理员发布后的通用流程有独立生命周期，需另行编辑或归档。
+Telo automatically extracts reusable workflows and repository engineering
+lessons in the background from completed Codex tasks, multi-step Missions, and
+high-signal conversations:
 
-搜索和状态筛选可以定位技能。保存冲突时重新加载，不要用旧草稿覆盖最新设置。工具不可用时，先配置对应 [集成](README.md)，或缩减技能范围。
+- Auto-extracted skills are classified into **Project** or **Global**, validated
+  against secret, prompt-injection, and safe-tool guards, and enabled automatically
+  without requiring manual approval steps.
+- When follow-up conversations or tasks refine an existing auto-extracted skill,
+  Telo updates it in place while preserving snapshots for existing schedules.
+  Built-in presets and GitHub-imported skills are never overwritten automatically.
+- Cards for auto-extracted skills display an **Auto** badge along with their source
+  and usage count. If you disable or archive an auto-extracted skill, Telo
+  remembers that choice and avoids recreating the same skill automatically.
+- You can also ask the assistant in Telegram to save or update a procedure directly
+  (for example, "Save this release checklist for acme/api").
+
+## Changes and availability
+
+Existing runs and schedules keep their saved instruction snapshots when you edit
+a skill or apply a GitHub update. New interactive runs load large catalogs
+progressively (indexing skill descriptions first and loading full instructions on
+demand). Disabling a skill can suspend dependent schedules. Archiving a custom
+skill preserves historical references and prevents enabling it again.
+
+Use search, the scope filter and the state filter to find a skill. If a save conflicts with another
+session, review the latest saved settings before retrying. Failed saves keep your
+input in the dialog. Configure missing tools through the relevant
+[integration](README.md) before using instructions that require them.

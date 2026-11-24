@@ -10,10 +10,7 @@ test("header and footer GitHub links share their icon, styling and keyboard focu
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
   const link = navigation.getByRole("link", { name: "GitHub", exact: true });
   await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute(
-    "href",
-    "https://github.com/stonega/repodesk",
-  );
+  await expect(link).toHaveAttribute("href", "https://github.com/stonega/telo");
   const icon = link.locator("svg");
   await expect(icon).toBeVisible();
   await expect(icon).toHaveAttribute("aria-hidden", "true");
@@ -34,7 +31,7 @@ test("header and footer GitHub links share their icon, styling and keyboard focu
   await expect(footerLink).toBeVisible();
   await expect(footerLink).toHaveAttribute(
     "href",
-    "https://github.com/stonega/repodesk",
+    "https://github.com/stonega/telo",
   );
   await expect(
     footer.getByRole("link", { name: "Source", exact: true }),
@@ -63,7 +60,7 @@ test("header and footer GitHub links share their icon, styling and keyboard focu
   );
   expect(styles).toHaveLength(2);
   expect(styles[0]).toEqual(styles[1]);
-  await footer.getByRole("link", { name: "RepoDesk home" }).focus();
+  await footer.getByRole("link", { name: "Telo home" }).focus();
   await page.keyboard.press("Tab");
   await expect(footerLink).toBeFocused();
   expect(
@@ -77,26 +74,34 @@ test("header and footer GitHub links share their icon, styling and keyboard focu
   ).toBeFocused();
 });
 
-test("renders a responsive page and working setup links", async ({
+test("renders a responsive Telo page with working setup and capability links", async ({
   page,
 }, info) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Your warm AI work buddy",
+  );
   await expect(page.getByRole("link", { name: "Get started" })).toHaveAttribute(
     "href",
     "/docs/user/get-started",
   );
-  await expect(
-    page.getByRole("link", { name: "Set up RepoDesk" }),
-  ).toHaveAttribute("href", "/docs/user/get-started");
-  for (const name of ["Read the documentation", "Documentation"]) {
+  await expect(page.getByRole("link", { name: "Set up Telo" })).toHaveAttribute(
+    "href",
+    "/docs/user/get-started",
+  );
+  for (const name of [
+    "Read the documentation",
+    "Documentation",
+    "Explore docs",
+  ]) {
     await expect(page.getByRole("link", { name, exact: true })).toHaveAttribute(
       "href",
       "/docs",
     );
   }
+  await expect(page.locator(".capability-card")).toHaveCount(6);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -108,6 +113,7 @@ test("renders a responsive page and working setup links", async ({
     fullPage: true,
   });
 });
+
 test("FAQ works with a keyboard", async ({ page }) => {
   await page.goto("/");
   const question = page
@@ -124,6 +130,7 @@ test("FAQ works with a keyboard", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.locator("details[open]")).toHaveCount(0);
 });
+
 test("navigation opens on mobile and closes after selecting a section", async ({
   page,
 }, info) => {
@@ -142,7 +149,10 @@ test("navigation opens on mobile and closes after selecting a section", async ({
   ).toHaveAttribute("aria-expanded", "false");
   await expect(page).toHaveURL(/#workflow$/);
 });
-test("reduced motion disables smooth scrolling", async ({ page }) => {
+
+test("reduced motion disables smooth scrolling and hides motion toggles", async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   expect(
@@ -150,6 +160,61 @@ test("reduced motion disables smooth scrolling", async ({ page }) => {
       () => getComputedStyle(document.documentElement).scrollBehavior,
     ),
   ).toBe("auto");
+  await expect(page.locator(".footer-motion-toggle")).toBeHidden();
+});
+
+test("paper boats footer renders with pause/resume controls and zero errors", async ({
+  page,
+}, info) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+
+  const footer = page.getByRole("contentinfo");
+  await footer.scrollIntoViewIfNeeded();
+
+  const stage = footer.locator(".paper-boats-stage");
+  await expect(stage).toBeVisible();
+  await expect(stage).toHaveAttribute("aria-hidden", "true");
+
+  const toggle = footer.getByRole("button", { name: /boats animation/i });
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+  // Clicking on the ocean stage triggers an interactive wave ripple without errors
+  const box = await stage.boundingBox();
+  if (box) {
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+  }
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle).toHaveText("Resume boats animation");
+
+  await toggle.focus();
+  await page.keyboard.press("Space");
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle).toHaveText("Pause boats animation");
+
+  expect(errors).toEqual([]);
+  await footer.screenshot({ path: info.outputPath("paper-boats-footer.png") });
+});
+
+test("paper boats footer degrades gracefully without JavaScript", async ({
+  browser,
+}, info) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: info.project.use.viewport,
+  });
+  const page = await context.newPage();
+  await page.goto("/");
+  const footer = page.getByRole("contentinfo");
+  await expect(footer.locator(".footer-boats-fallback")).toBeVisible();
+  await expect(footer.locator(".footer-motion-toggle")).toBeHidden();
+  await expect(footer.locator(".footer-motion-toggle")).toBeDisabled();
+  await context.close();
 });
 
 test("illustrated workflow stays readable, static and inside its cards", async ({

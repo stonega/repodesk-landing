@@ -21,10 +21,10 @@ export function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-  { title: `${data?.document.title ?? "Documentation"} — RepoDesk Docs` },
+  { title: `${data?.document.title ?? "Documentation"} — Telo Docs` },
   {
     name: "description",
-    content: `${data?.document.title ?? "User documentation"} from the RepoDesk user guides. Deployment, configuration, Telegram workflows and integrations.`,
+    content: `${data?.document.title ?? "User documentation"} from the Telo user guides. Deployment, configuration, Telegram workflows and integrations.`,
   },
 ];
 
@@ -63,18 +63,20 @@ export function DocumentationPage({
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="site-header wrap docs-header">
-        <a href="/" className="wordmark" aria-label="RepoDesk home">
-          <img src="/repodesk-mark.svg" width="32" height="32" alt="" />
-          RepoDesk
-        </a>
-        <nav aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/docs" aria-current="page">
-            Docs
+      <header className="site-header-shell">
+        <div className="site-header wrap docs-header">
+          <a href="/" className="wordmark" aria-label="Telo home">
+            <img src="/telo-mark.svg" width="32" height="32" alt="" />
+            Telo
           </a>
-          <a href={docsSnapshot.repository}>GitHub</a>
-        </nav>
+          <nav aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/docs" aria-current="page">
+              Docs
+            </a>
+            <a href={docsSnapshot.repository}>GitHub</a>
+          </nav>
+        </div>
       </header>
       <div className="docs-layout wrap">
         <aside className="docs-sidebar">
@@ -86,10 +88,10 @@ export function DocumentationPage({
         </details>
         <main id="main" className="docs-main" tabIndex={-1}>
           <div className="docs-provenance">
-            <p className="eyebrow">REPODESK DOCUMENTATION</p>
+            <p className="eyebrow">TELO DOCUMENTATION</p>
             <p>
-              User guides from <strong>stonega/repodesk</strong>. Available
-              features depend on your deployment version, connected services and
+              User guides from <strong>stonega/telo</strong>. Available features
+              depend on your deployment version, connected services and
               workspace settings.
             </p>
             <a href={sourceUrl(document)}>

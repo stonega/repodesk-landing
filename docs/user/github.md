@@ -11,37 +11,45 @@
 5. 在 GitHub 选择目标仓库并返回。首次设置会尝试连接唯一可用的 installation；存在多个时，到 Plugins 明确选择 installation 和仓库，再点击 **Connect selected repositories**。
 6. 确认面板列出正确仓库。
 
-新建 App 的凭据由 RepoDesk 加密保存，无需下载图标、手工粘贴私钥或创建个人访问令牌。授权流程十分钟有效，保持同一个登录浏览器和站点地址；过期后从面板重新开始。
+新建 App 的凭据由 Telo 加密保存，无需下载图标、手工粘贴私钥或创建个人访问令牌。授权流程十分钟有效，保持同一个登录浏览器和站点地址；过期后从面板重新开始。
 
 GitHub 的 **Authorized GitHub Apps** 仅表示身份授权；**Installed GitHub Apps** 才表示 App 已安装。两个步骤均完成后才有仓库访问。
 
 ### App 权限与仓库变更
 
-完整工作流使用 Contents、Issues、Pull requests 的读写权限和 Metadata 只读权限；成员目录还使用组织 Members 只读权限。新 App 会预填这些权限。
+完整工作流使用 Contents、Issues、Pull requests、Repository creation 的读写权限和 Metadata 只读权限；成员目录还使用组织 Members 只读权限。新 App 会预填这些权限。
 
-已有 App 增加权限后，需要在 GitHub installation 接受新权限，组织可能需要 owner 批准。仅在 RepoDesk 重新连接不能授予缺失权限。
+已有 App 增加权限后，需要在 GitHub installation 接受新权限，组织可能需要 owner 批准。仅在 Telo 重新连接不能授予缺失权限。
 
-仓库重命名会按已选仓库的数字身份更新；后来新授权的仓库不会自动加入工作区，需要重新授权和选择。GitHub 中的 **All repositories** 会授权其范围内的仓库，选择前确认符合预期。
+仓库重命名会按已选仓库的数字身份更新。开启 **All repositories (auto-sync)** 模式的工作区会自动同步 GitHub App 可访问的新建或新增仓库（通过后台定期同步、GitHub Webhook、以及打开面板刷新），并触发已绑定成员的权限刷新；仅选择指定仓库的工作区仍保持已选范围，不会自动加入其他仓库。
+
+在管理面板的 **Overview → Manage GitHub** 中，可以随时点击 **Sync repositories** 立即同步、点击 **Auto-sync all repositories** / **Use selected only** 切换同步模式，或点击 **Change repositories** 重新选择仓库。工作区管理员也可以在 Telegram 机器人私聊中直接让机器人同步工作区仓库或开启“所有仓库自动同步”。GitHub 中的 **All repositories** 会授权其范围内的仓库，选择前确认符合预期。
 
 ## 成员：验证自己的账号
 
-1. 先加入工作区，在机器人私聊发送 `/github` 或 `/github connect`。
+1. Join the workspace, then ask “Connect my GitHub account” in the bot's private chat.
 2. 打开授权链接，在 GitHub 确认账号和授权。
 3. 返回原 Telegram 私聊，核对显示的 GitHub 登录名并点击 **Connect account**。
 
-仅浏览器授权不会完成绑定。无需另建面板账号。多工作区先使用 `/workspace <UUID>` 选择目标；同一 GitHub 身份在一个工作区只能关联一个成员。
+仅浏览器授权不会完成绑定。无需另建面板账号。With multiple workspaces, ask to switch to the intended workspace first；同一 GitHub 身份在一个工作区只能关联一个成员。
 
-`/github sync` 手动刷新权限；worker 也会定期刷新。`/github disconnect` 清除本人连接和有效授权，并取消待处理工作，不会恢复更宽的仓库访问。
+Ask “Refresh my GitHub permissions” to sync immediately; the worker also refreshes periodically. Ask “Disconnect my GitHub account” to remove your connection and invalidate pending work. Disconnecting does not restore wider access.
 
 连接后的读取需要 GitHub 读权限，Codex 需要已验证的写权限。GitHub admin 身份不会提升工作区角色，管理员代选的 GitHub 资料也不能替代本人验证。
 
 ## 查询仓库、Issue 和 PR
 
-发送 `/repos` 选择默认仓库，或每次写出 `owner/repository`。
+Ask “Help me choose a repository”, or name `owner/repository` in each request.
 
 - “列出 example/app 本周合并的 PR，附日期和链接。”
 - “example/app 的 Issue #42 现在是什么状态？”
 - “比较 PR #12 和 #15 的代码改动、审查意见和未解决问题。”
+- “Show the current stars, forks and watchers for example/app, with its link and retrieval time.”
+
+Repository statistics use the connected GitHub App's existing Metadata read
+permission. Watchers are users subscribed to repository notifications. The
+report provides current totals; historical counts and daily changes require
+separate verified evidence. These queries also work in repository schedules.
 
 GitHub 连接本身支持元数据、PR 改动及审查记录查询，不要求启动 Code Truth。理解仓库中更广泛的源码，使用 [Code Truth](code-truth.md)。分页、缺失补丁或截断会限制结论，可以要求继续查询并说明覆盖范围。
 
@@ -65,6 +73,32 @@ GitHub 连接本身支持元数据、PR 改动及审查记录查询，不要求�
 
 Codex 创建 PR 不代表授权合并。使用消息上的 **Review / Merge** 会打开 GitHub 页面，不会仅因点击链接而执行合并。
 
+## 创建新仓库
+
+例如：“创建一个名为 new-service 的私有仓库，初始化 README”，或“创建一个公开仓库 docs-site”。
+
+请求者必须先在机器人私聊中验证自己的 GitHub 账号（`/github`），并在十五分钟内本人点击 **Approve** 确认仓库归属、名称、可见性（默认 `private`）及初始化选项。私有或内部仓库需在私聊中发起。
+
+- **个人账号连接**：仅该个人 GitHub 账号本人可在该账号下创建新仓库（支持 `private` / `public`）；工作区其他成员（含工作区管理员）不可代建。
+- **GitHub 组织连接**：使用请求者本人的已验证 GitHub 账号在组织下创建，遵循组织本身的权限设置（组织 owner、成员建库权限及公开/私有/内部可见性限制等）。
+
+新建 GitHub App 会预填 **Repository permissions → Repository creation: Read and write** 权限；已有 App 需在 GitHub App 设置中补充 **Repository creation: Read and write**（或 **Administration: Read and write**）并在对应 installation 接受权限更新。开启“所有仓库自动同步”的工作区会在创建成功后立即将该仓库纳入工作区连接列表；仅选择指定仓库的工作区保持原选择并在消息中返回新仓库链接。
+
 ## 开发与审查
 
 [Codex](codex.md) 用于实现修改并生成 PR；[Review Bot](review-bot.md) 用于自动审查和同一 PR 上的明确修复。它们均需额外启用。权限失败见 [排障指南](troubleshooting.md)。
+
+### Codex execution environment
+
+Deployment operators can select Docker, OpenSandbox or **Native VPS** under
+**Plugins → Codex → Runtime → Edit**. Native VPS uses the Codex CLI and development
+tools installed on a dedicated host and executes trusted repositories with its
+service user's permissions. It requires a prepared host service; saving the option
+does not install it. Provider/ChatGPT sign-in, repository permissions, progress,
+Stop and PR publication use the existing Codex settings and task flow. Docker
+remains the default. Runtime changes wait for retained tasks to be cleaned up.
+
+## Personal repository notifications
+
+See [GitHub notifications](github-notifications.md) to receive private Telegram
+notifications for new PRs and issues, manage subscriptions and configure delivery.

@@ -1,19 +1,11 @@
-# RepoDesk landing page
+# Telo landing page
 
-Public landing page and dedicated live acceptance repository for RepoDesk's Codex plugin.
-This is a marketing demo, not a running RepoDesk service. Conversations and PR examples
-on the page are illustrative. Product source: https://github.com/stonega/repodesk.
+Public landing page for **Telo** (formerly RepoDesk) and dedicated live acceptance
+repository for Telo's coding plugins. This is a marketing demo, not a running Telo
+service. Conversations and PR examples on the page are illustrative. Product source:
+https://github.com/stonega/telo.
 
 Production: https://repodesk-landing.pages.dev
-
-Acceptance status (2026-10-17): production is deployed. The real VPS Docker Codex
-task completed after requester approval and produced [PR #2](https://github.com/stonega/repodesk-landing/pull/2).
-Verify and native Cloudflare Pages checks passed; its automatic preview is
-https://51612f60.repodesk-landing.pages.dev. The PR remains open for review.
-An isolated OpenSandbox repeat also passed and produced
-[PR #3](https://github.com/stonega/repodesk-landing/pull/3), with passing CI and
-preview https://36cfc077.repodesk-landing.pages.dev.
-The fixed `baseline-v1` is unchanged.
 
 ## Local development
 
@@ -26,6 +18,7 @@ bun run dev
 
 ```sh
 bun run verify
+bun scripts/verify-docs-build.tsx
 bash scripts/verify-browser.sh
 ```
 
@@ -33,31 +26,26 @@ The browser script installs Chromium, prepares missing Linux libraries locally
 when needed, and runs `bun run test:browser` without GitHub or model credentials.
 
 React Router v7 prerenders the page into `build/client`. Tailwind v4 provides the
-CSS entry point, with page-specific design tokens and styles; no UI kit is needed.
-Biome handles formatting and lint. Unit tests render the real page; Playwright checks
-mobile/desktop navigation, overflow, disclosures, setup destinations, reduced motion
-and the accessible Code Q&A / Fix an issue / PR review example tabs. The walkthrough
-contains sample outcomes only, not live task results. See [page guidance](docs/user/landing.md)
-for keyboard controls.
-The repository-scoped preview includes a sample access trace, CSS diff and review
-checklist. It does not connect to Telegram or GitHub or accept messages. Scenario
-content, accessible tabs, outcome cards and shared site navigation are maintained
-separately so the marketing page stays easy to change without implying a live app.
-The brighter, illustration-led design uses local decorative SVG stories, rounded
-cards and system fonts. It preserves the green vector mark and adds no dependencies
-or external asset requests. See the visual storytelling section in the page guidance.
+CSS entry point alongside Telo's warm sunny origami design tokens. Three.js (`three`)
+powers the decorative floating origami hero layer and the interactive paper-boats-on-water
+footer scene, with static SVG fallbacks, pause/resume controls, and `prefers-reduced-motion`
+support. Biome handles formatting and lint. Unit tests render the real page and test
+the wave/buoyancy math deterministically; Playwright checks mobile/desktop navigation,
+overflow, disclosures, setup destinations, reduced motion, the paper-boats footer, the
+animated workflow diagram, and the accessible Code Q&A / Fix an issue / PR review example
+tabs. See [page guidance](docs/user/landing.md) for keyboard and motion controls.
 
 ## Product documentation
 
-`/docs` renders only the user guides from **stonega/repodesk** inside this landing
-application. The source is `../repodesk/docs/user/`; guides are copied unchanged to
+`/docs` renders only the user guides from **stonega/telo** inside this landing
+application. The source defaults to `../telo/docs/user/`; guides are copied unchanged to
 `docs/user/` and relative documentation links stay on the site. The user README is
 the documentation index; other guides keep their `/docs/user/` paths without `.md`.
 Design, implementation, reference, research and assistant personality documents
 are excluded.
 
 Builds and tests use the local snapshot and need no GitHub credentials or live API.
-`src/content/repodesk/manifest.json` records the source revision, hashes and routes.
+`src/content/telo/manifest.json` records the source revision, hashes and routes.
 Guides with uncommitted source edits are labeled; their GitHub links show the
 upstream committed version. Run `bun scripts/verify-docs-build.tsx` after building
 to verify every prerendered guide.
@@ -66,16 +54,15 @@ To preview the built site, run `bun run build && bun run preview`. The local
 static preview serves prerendered directory indexes at both `/docs` and `/docs/`,
 including deep pages. It is development/test tooling, not a production server.
 
-To refresh the [user guides](docs/user/README.md) from the sibling checkout:
+To refresh the [user guides](docs/user/README.md) from a local Telo checkout:
 
 ```sh
-bun run docs:sync
+bun run docs:sync /path/to/telo
 bun run verify
 bun scripts/verify-docs-build.tsx
 bun run test:browser
 ```
 
-Pass a checkout path to sync from another location: `bun run docs:sync /path/to/repodesk`.
 Refreshes update the manifest and remove previously synced guides that no longer
 exist upstream. [Landing-page guidance](docs/user/landing.md) is maintained locally
 and is not published in the product documentation navigation.

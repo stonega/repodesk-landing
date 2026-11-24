@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { REPO_URL } from "../lib/site";
+import { BRAND_NAME, REPO_URL } from "../lib/site";
+import PaperBoatsStage from "./paper-boats-footer";
 
 const navigationLinks = [
   { href: "#workflow", label: "How it works" },
+  { href: "#capabilities", label: "Capabilities" },
   { href: "#principles", label: "Built for your team" },
   { href: "/docs", label: "Docs" },
 ];
@@ -15,7 +17,9 @@ export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
       <path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} />
@@ -23,7 +27,7 @@ export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-function GitHubLink({ onClick }: { onClick?: () => void }) {
+export function GitHubLink({ onClick }: { onClick?: () => void }) {
   return (
     <a href={REPO_URL} className="github-link" onClick={onClick}>
       GitHub{" "}
@@ -41,11 +45,11 @@ function GitHubLink({ onClick }: { onClick?: () => void }) {
   );
 }
 
-function Mark() {
+export function BrandMark({ size = 34 }: { size?: number }) {
   return (
     <span className="wordmark">
-      <img src="/repodesk-mark.svg" width="32" height="32" alt="" />
-      RepoDesk
+      <img src="/telo-mark.svg" width={size} height={size} alt="" />
+      {BRAND_NAME}
     </span>
   );
 }
@@ -72,48 +76,80 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="site-header wrap">
-      <a href="/" aria-label="RepoDesk home">
-        <Mark />
-      </a>
-      <button
-        ref={menuButton}
-        className="menu-button"
-        type="button"
-        aria-expanded={menuOpen}
-        aria-controls="site-nav"
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        {menuOpen ? "Close" : "Menu"}
-      </button>
-      <nav
-        id="site-nav"
-        aria-label="Main navigation"
-        className={menuOpen ? "nav open" : "nav"}
-      >
-        {navigationLinks.map((link) => (
-          <a key={link.href} href={link.href} onClick={closeMenu}>
-            {link.label}
-          </a>
-        ))}
-        <GitHubLink onClick={closeMenu} />
-      </nav>
+    <header className="site-header-shell">
+      <div className="site-header wrap">
+        <a href="/" aria-label="Telo home">
+          <BrandMark />
+        </a>
+        <button
+          ref={menuButton}
+          className="menu-button"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="site-nav"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? "Close" : "Menu"}
+        </button>
+        <nav
+          id="site-nav"
+          aria-label="Main navigation"
+          className={menuOpen ? "nav open" : "nav"}
+        >
+          {navigationLinks.map((link) => (
+            <a key={link.href} href={link.href} onClick={closeMenu}>
+              {link.label}
+            </a>
+          ))}
+          <GitHubLink onClick={closeMenu} />
+        </nav>
+      </div>
     </header>
   );
 }
 
 export function SiteFooter() {
+  const [paused, setPaused] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => setHydrated(true), []);
+
   return (
-    <footer className="site-footer wrap">
-      <a href="/" aria-label="RepoDesk home">
-        <Mark />
-      </a>
-      <p>From conversation to contribution.</p>
-      <div>
-        <GitHubLink />
-        <a href="/docs">
-          Documentation <Arrow diagonal />
-        </a>
+    <footer
+      className={`site-footer${hydrated ? " is-animated" : ""}${paused ? " is-paused" : ""}`}
+    >
+      <div className="footer-ocean-wrap">
+        <PaperBoatsStage paused={paused} />
+        <div className="footer-ocean-caption wrap">
+          <p className="footer-scene-note">
+            Smooth sailing from conversation to pull request.
+          </p>
+          <button
+            type="button"
+            className="footer-motion-toggle"
+            aria-pressed={paused}
+            disabled={!hydrated}
+            onClick={() => setPaused(!paused)}
+          >
+            {paused ? "Resume boats animation" : "Pause boats animation"}
+          </button>
+        </div>
+      </div>
+      <div className="footer-bar-shell">
+        <div className="footer-bar wrap">
+          <a href="/" aria-label="Telo home">
+            <BrandMark size={28} />
+          </a>
+          <p className="footer-tagline">
+            Your warm, dependable AI work buddy for GitHub inside Telegram.
+          </p>
+          <div className="footer-links">
+            <GitHubLink />
+            <a href="/docs" className="footer-docs-link">
+              Documentation <Arrow diagonal />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );

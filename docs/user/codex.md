@@ -4,16 +4,19 @@
 
 普通聊天可用并不表示 Codex 已准备好。管理员需要配置执行环境、模型认证和 GitHub 连接，成员需要验证 GitHub 写权限。
 
+For investigations and version releases using internal repository guides,
+see [repository investigations and releases](repository-tasks.md).
+
 ## 管理员：准备执行环境
 
-下面适用于 [快速开始](get-started.md) 的源码 Compose 部署，使用 Docker runner。如果已经使用 RepoDesk 的专用 VPS 更新器部署了 runner，先检查现有服务，不要再启动一套。
+下面适用于 [快速开始](get-started.md) 的源码 Compose 部署，使用 Docker runner。如果已经使用 Telo 的专用 VPS 更新器部署了 runner，先检查现有服务，不要再启动一套。
 
 runner 的可信管理容器需要 Docker socket，可以控制宿主机 Docker。使用可信、专用的部署主机；任务容器不获得该 socket，也不接入应用数据库网络。
 
 在仓库根目录构建任务镜像：
 
 ```sh
-docker build --target codex-job -t localhost/deepx-codex-job:local .
+docker build --target codex-job -t localhost/telo-codex-job:local .
 ```
 
 生成管理令牌并填入私有 `.env`：
@@ -65,6 +68,20 @@ docker compose ps
 
 机器人把原始要求交给 Codex；明确的修改请求授权对应持续任务，通过检查后自动发布 PR，无需先创建 Issue 或再次批准开发。分析请求不会授权实现或发布。
 
+## Reference repositories
+
+To refresh documentation from another repository, name both the source and the
+modification target in your request. For example: “Copy `docs/user` from
+`example/product` into `example/product-site`; keep `product-site` as the only
+modification target.” Both repositories must be selected in the workspace. Every
+contributor needs verified read access to the source and write access to the target.
+
+Telo prepares the named source's default branch at a recorded commit before
+Codex starts. Full repository names avoid ambiguity. Reference repositories do not
+receive code changes or PRs. If source access or another required environment
+condition is unavailable, the task reports the blocker for an administrator to
+resolve. Repeating “continue” does not repair a missing environment prerequisite.
+
 ## 补充需求与提问
 
 回复任务消息、必要问题，或在同一 Topic 继续讨论：
@@ -77,13 +94,36 @@ docker compose ps
 
 后续修改通常更新同一个 PR。已关闭或合并的 PR 不会自动重建。目标仓库写错时立即说明；只有尚未产生工作成果且满足安全条件的空任务可以替换目标，已有修改不能直接搬到其他仓库。
 
-## 状态、停止与 PR
+## Continue a task from GitHub
 
-进度消息更新已确认阶段；必要问题、阻塞和最终结果会有新消息。用最新任务消息上的 **Status / Cancel**，或 `/status`、`/cancel` 查看和停止。也可以在绑定对话发送“停止”或 `stop`。
+When Review Bot requests and fixes are enabled, use the same verified GitHub
+account that started the Telegram task to post a clear fix request on its PR:
 
-旧消息上的控制按钮可能已失效，重新发送 `/status` 获取当前状态。停止是尽力操作，已发布的分支和 PR 保留，进行中的外部写入可能仍完成。
+> @telo[bot] fix the pagination edge case described above.
 
-PR 消息中的 **Review** 打开改动页面，**Merge** 打开 GitHub PR。链接本身不执行合并；自动创建 PR 不包含合并或部署授权。普通 Telegram PR 合并操作见 [GitHub 指南](github.md)。当前开发任务不会发布 `.github/` 目录修改。
+Use your installation's actual bot handle. PRs confirmed as published by this
+version continue the original task and PR. Return to the original Telegram
+conversation for status, product questions and **View conversation**. Explanations
+and reviews remain read-only; other collaborators and older PRs without a binding
+use Review Bot's separate workflow. Edited/deleted instructions or lost access
+stop further execution and publication. Temporary source failures retry
+automatically. Merge and deployment require their own authorization.
+
+## Status, stopping and PRs
+
+Progress edits show confirmed stages; necessary questions, blockers and final
+results arrive as new messages. Task messages keep **View conversation** and omit
+inline Status/Cancel buttons. Ask for status or send `/status` in the task's
+conversation. Use `/cancel`, “停止” or `stop` to stop work.
+
+Controls on older messages may have expired; send `/status` for the current state.
+Stopping is best effort: published branches and PRs remain, and an external write
+already in progress may still complete.
+
+PR messages retain **Review** to open the changed files and **Merge** to open the
+GitHub PR. The link itself does not merge; automatic PR creation does not authorize
+merging or deployment. See the [GitHub guide](github.md) for Telegram PR merge
+requests. Current development tasks cannot publish changes under `.github/`.
 
 ## 查看完整任务记录
 
@@ -93,8 +133,10 @@ PR 消息中的 **Review** 打开改动页面，**Merge** 打开 GitHub PR。链
 
 ## 中断与恢复
 
+- **服务器关闭或执行环境中断**：新版本创建的任务在确认中断原因后，会保留工作区、重新验证权限和凭据，再继续原任务及完整检查。恢复期间仍可停止；普通失败、OOM、已取消和旧的失败任务不会因此自动重跑。
 - **等待登录**：管理员在 Codex 页面重新认证，再检查原任务状态。
 - **暂时无法验证 GitHub 权限**：任务会等待自动恢复；必要时 `/github sync`，授权失效则重新 `/github`。
+- **仓库配置变化**：新任务只受目标仓库、GitHub 连接和 Codex 配置变化影响；其他仓库的变化可能短暂等待权限同步，随后继续原任务。目标仓库改名、默认分支或可见性改变、连接被替换或写权限撤销时，任务仍会停止。旧版本已失败的任务不会自动重跑。
 - **缺少默认分支**：在 GitHub 修正仓库默认分支，再提出新请求。
 - **发布结果未知**：先检查 GitHub 的分支和 PR，未知写入不会自动重放。
 

@@ -1,6 +1,9 @@
 # 公开部署与 HTTPS
 
-先按 [快速开始](get-started.md) 启动服务并创建首个管理员，再开放公网访问。公开部署可以使用 webhook；polling 也可继续使用，但 GitHub 回调、Review Bot 和 Telegram 任务记录入口需要各自可访问的站点地址。
+Start the service using [Get started](get-started.md), configure the public HTTPS
+site, then open it to create the first administrator in the web UI. Public
+deployments can use webhooks or continue polling; GitHub callbacks, Review Bot
+and Telegram task history need a reachable site address.
 
 ## 部署前准备
 
@@ -8,13 +11,10 @@
 
 固定部署目录和 Compose 项目名。数据卷与项目名关联，移动目录或改名后可能连接到新的空卷。长期使用前建立 [备份和恢复流程](maintenance.md)。
 
-远程首次设置可通过 SSH 隧道完成：
-
-```sh
-ssh -L 3000:127.0.0.1:3000 YOUR_USER@YOUR_SERVER
-```
-
-浏览器访问 `http://localhost:3000/setup`，先领取管理员账号。
+Once HTTPS is configured, open `https://YOUR_DOMAIN/setup` and choose the first
+administrator's username and password. No default account, bootstrap token,
+SSH tunnel or separate publication command is required. SSH forwarding remains
+an option for private/local testing.
 
 ## 配置站点
 
@@ -24,7 +24,7 @@ ssh -L 3000:127.0.0.1:3000 YOUR_USER@YOUR_SERVER
 4. 设置 `.env` 的公开地址，不加末尾斜杠：
 
 ```dotenv
-PUBLIC_ORIGIN=https://repodesk.example.com
+PUBLIC_ORIGIN=https://telo.example.com
 TELEGRAM_TRANSPORT=webhook
 ```
 
@@ -38,8 +38,8 @@ docker compose up -d
 检查 HTTPS 登录和以下端点：
 
 ```sh
-curl --fail https://repodesk.example.com/healthz
-curl --fail https://repodesk.example.com/readyz
+curl --fail https://telo.example.com/healthz
+curl --fail https://telo.example.com/readyz
 ```
 
 `/healthz` 表示应用进程存活；`/readyz` 还检查 worker 等条件。注册 webhook 之前，接收器可能尚未就绪。
@@ -60,7 +60,7 @@ curl --fail https://repodesk.example.com/readyz
 
 ### 从 webhook 切回 polling
 
-先停止原接收实例，使用 Telegram 的 `deleteWebhook` 删除原 webhook，并保留待处理更新（`drop_pending_updates=false`），再改为 `polling` 并重新创建 app/worker。RepoDesk 不会自动删除已有 webhook。
+先停止原接收实例，使用 Telegram 的 `deleteWebhook` 删除原 webhook，并保留待处理更新（`drop_pending_updates=false`），再改为 `polling` 并重新创建 app/worker。Telo 不会自动删除已有 webhook。
 
 接口说明见 [getUpdates](https://core.telegram.org/bots/api#getupdates) 和 [deleteWebhook](https://core.telegram.org/bots/api#deletewebhook)。
 
@@ -71,7 +71,7 @@ curl --fail https://repodesk.example.com/readyz
 | 用途 | 路径或配置入口 |
 | --- | --- |
 | GitHub 用户授权回调 | `/api/admin/github/callback` |
-| GitHub App 创建回调 | 由 RepoDesk 的创建流程提供 |
+| GitHub App 创建回调 | 由 Telo 的创建流程提供 |
 | Review Bot webhook | 复制 Review Bot 页面显示的完整 URL |
 | Cloudflare 授权回调 | `/api/admin/cloudflare/callback` |
 
@@ -82,7 +82,7 @@ curl --fail https://repodesk.example.com/readyz
 Codex 的 **View conversation** 打开只读 Mini App，需要额外配置：
 
 1. 站点已经提供 HTTPS。
-2. 在 BotFather 启用机器人的 **Main Mini App**，URL 设为 `https://repodesk.example.com/mini`。
+2. 在 BotFather 启用机器人的 **Main Mini App**，URL 设为 `https://telo.example.com/mini`。
 3. 从 Telegram 任务消息打开 **View conversation**，分别检查私聊和已关联群组。
 
 普通浏览器访问 `/mini` 不能读取任务记录。转发链接不会授予访问权限；访问者仍需通过 Telegram 身份和当前任务权限检查。详情见 [Codex 开发任务](codex.md)。

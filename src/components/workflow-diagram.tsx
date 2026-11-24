@@ -62,8 +62,8 @@ export default function WorkflowDiagram() {
         </div>
         <div className="diagram-hub">
           <span className="flow-halo" aria-hidden="true" />
-          <img src="/repodesk-mark.svg" width="48" height="48" alt="" />
-          <strong>RepoDesk</strong>
+          <img src="/telo-mark.svg" width="52" height="52" alt="" />
+          <strong>Telo</strong>
         </div>
         <div className="diagram-telegram">
           <strong className="diagram-chat-title">Telegram</strong>

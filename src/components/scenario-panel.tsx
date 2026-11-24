@@ -57,18 +57,20 @@ export default function ScenarioPanel({
         <p>{scenario.request}</p>
       </div>
       <div className="message incoming">
-        <strong>RepoDesk · example response</strong>
+        <strong>Telo · example response</strong>
         <p>{scenario.reply}</p>
       </div>
       <div className="task-progress">
         <svg
           className="handoff-icon"
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
         >
           <path d="M5 4v7a3 3 0 0 0 3 3h11m-5-5 5 5-5 5" />

@@ -1,0 +1,244 @@
+{
+  "repository": "https://github.com/stonega/telo",
+  "revision": "ad3f3d1792d1b54c935deb96ae6143a6103bbe3f",
+  "documents": [
+    {
+      "source": "docs/user/README.md",
+      "route": "/docs",
+      "title": "Telo 用户文档",
+      "sha256": "589c12206cbc8930abf51f5ffd4b5fd4b6b948a1b34a7da73595871c86b91521",
+      "modified": false
+    },
+    {
+      "source": "docs/user/administration.md",
+      "route": "/docs/user/administration",
+      "title": "工作区与成员",
+      "sha256": "426294acbe1121ca87486e4e67c5600e71e72b08e47d525c8f44870f92a3e9a3",
+      "modified": false
+    },
+    {
+      "source": "docs/user/agent-orchestration.md",
+      "route": "/docs/user/agent-orchestration",
+      "title": "Agent Orchestration, Autonomy, and Automations",
+      "sha256": "574876224a357a85cbb3f0eeda8fedb9c64848a4afc7f36490353b6ac1fdec55",
+      "modified": false
+    },
+    {
+      "source": "docs/user/antigravity.md",
+      "route": "/docs/user/antigravity",
+      "title": "Antigravity CLI coding tasks",
+      "sha256": "489a787212d810802acd7d2b524532900c3a24efb5cbe6b35f2773afbeb6fbe5",
+      "modified": false
+    },
+    {
+      "source": "docs/user/audio.md",
+      "route": "/docs/user/audio",
+      "title": "Voice notes and audio recordings",
+      "sha256": "d6ae6515881ebed88536aed4b095695be9b50e018247fe4e7df63cd679ceb28c",
+      "modified": false
+    },
+    {
+      "source": "docs/user/browser-host.md",
+      "route": "/docs/user/browser-host",
+      "title": "Install the Browser host",
+      "sha256": "4d237a423d84d38e129b2d565464be7abda2fafeee5f2d49000382f80ad3a5eb",
+      "modified": false
+    },
+    {
+      "source": "docs/user/browser.md",
+      "route": "/docs/user/browser",
+      "title": "Private host browser",
+      "sha256": "3918d849bc22a033941b0887f9e86d06dee4d2c9256bbd8c73a952abb8ef69fb",
+      "modified": false
+    },
+    {
+      "source": "docs/user/cloudflare.md",
+      "route": "/docs/user/cloudflare",
+      "title": "Cloudflare",
+      "sha256": "bade12384ca20899dc36be67217b41d143893f9fe41aa78debae83803a2cbcc6",
+      "modified": false
+    },
+    {
+      "source": "docs/user/code-truth.md",
+      "route": "/docs/user/code-truth",
+      "title": "代码问答：Code Truth",
+      "sha256": "97a7f512f82b762eab772ea1ae59fb30539e6d1e53143cb4512d68a7cdc5b818",
+      "modified": false
+    },
+    {
+      "source": "docs/user/codex.md",
+      "route": "/docs/user/codex",
+      "title": "Codex 开发任务",
+      "sha256": "8cb0486d59e2bd8947b133835047a7ec419fba674edfe78da05ea0ece7954799",
+      "modified": false
+    },
+    {
+      "source": "docs/user/commands.md",
+      "route": "/docs/user/commands",
+      "title": "Chat requests",
+      "sha256": "523f7a79a85eca8f796a678b50f9e5eee6a00d80d6c32f297bd133880ffa9c2e",
+      "modified": false
+    },
+    {
+      "source": "docs/user/configuration.md",
+      "route": "/docs/user/configuration",
+      "title": "模型与配置",
+      "sha256": "76afc6cf65ef6a996ce44b74e68d9aaf3255673ed716236df2e8e9824eee14de",
+      "modified": false
+    },
+    {
+      "source": "docs/user/deployment.md",
+      "route": "/docs/user/deployment",
+      "title": "公开部署与 HTTPS",
+      "sha256": "a2d8a41217933a7fb23f001cd7e71310b3d630f995b95df1438bf36f8a7eea83",
+      "modified": false
+    },
+    {
+      "source": "docs/user/get-started.md",
+      "route": "/docs/user/get-started",
+      "title": "Get started：快速开始",
+      "sha256": "5545eb31d81544c3b85acfb9421f7dfccfff11f8b584095d6e82b28867b3beab",
+      "modified": false
+    },
+    {
+      "source": "docs/user/github-notifications.md",
+      "route": "/docs/user/github-notifications",
+      "title": "GitHub notifications",
+      "sha256": "fb81876ad2a7601fd44c6ed21a7828bca534c055f39febd9ab94b61440751be7",
+      "modified": false
+    },
+    {
+      "source": "docs/user/github.md",
+      "route": "/docs/user/github",
+      "title": "连接和使用 GitHub",
+      "sha256": "4a91d36e8d7e8b6de01f477163be6e1dd393c5fa9ec2a9206512f176e68b2d43",
+      "modified": false
+    },
+    {
+      "source": "docs/user/google-workspace.md",
+      "route": "/docs/user/google-workspace",
+      "title": "Google",
+      "sha256": "42b5756b3d19738949b541b2197328a9a1f32845b6960e96c24c5f665e7464b5",
+      "modified": false
+    },
+    {
+      "source": "docs/user/groups.md",
+      "route": "/docs/user/groups",
+      "title": "群组与话题",
+      "sha256": "36bae70b97bc1c41ef318f7379db750cf5c62a39a06f4dafdf8e776bf8c8bee4",
+      "modified": false
+    },
+    {
+      "source": "docs/user/local-plugins.md",
+      "route": "/docs/user/local-plugins",
+      "title": "Trusted local Pi extensions",
+      "sha256": "c8094de6582df0483a3162b1dd01e32c6b9289bfe76ee36807d6cda8aa380273",
+      "modified": false
+    },
+    {
+      "source": "docs/user/maintenance.md",
+      "route": "/docs/user/maintenance",
+      "title": "备份、升级与恢复",
+      "sha256": "2e6f8f3574586851d64502434ab78080efec46a1bc6b33e7b2eb9c3605066bc5",
+      "modified": false
+    },
+    {
+      "source": "docs/user/memory-and-privacy.md",
+      "route": "/docs/user/memory-and-privacy",
+      "title": "记忆与隐私",
+      "sha256": "569d18b6e56ef5ff12d451fd8d17fe807ff07c7fbcc00d0cdc4878001b590773",
+      "modified": false
+    },
+    {
+      "source": "docs/user/nowledge-mem.md",
+      "route": "/docs/user/nowledge-mem",
+      "title": "Nowledge Mem",
+      "sha256": "4ad5be42930d91d50035adad80f6465123c233a4223f817fb977f9ea2f1c2862",
+      "modified": false
+    },
+    {
+      "source": "docs/user/obsidian.md",
+      "route": "/docs/user/obsidian",
+      "title": "Organization notes with Obsidian",
+      "sha256": "b9ec470a0dbbfbc71a8daac26b3517e1cbf79cc3808f7db711fe56109069224e",
+      "modified": false
+    },
+    {
+      "source": "docs/user/plugin-administration.md",
+      "route": "/docs/user/plugin-administration",
+      "title": "Manage GitHub plugins",
+      "sha256": "31f5eb16c2cda56c986bc8ef7400c44dd5b24f9493ed73f89e15d941e75e4aa1",
+      "modified": false
+    },
+    {
+      "source": "docs/user/plugin-development.md",
+      "route": "/docs/user/plugin-development",
+      "title": "Develop a GitHub plugin",
+      "sha256": "b552bde00dfee7fa64aa114ba900ed7e58ddfaa2e767fbf20031a5a531369872",
+      "modified": false
+    },
+    {
+      "source": "docs/user/preference-memory.md",
+      "route": "/docs/user/preference-memory",
+      "title": "Source-grounded preferences",
+      "sha256": "e2016d26177310bf187651a2a966a5d043473087f83f8efdee91abba05917ca9",
+      "modified": false
+    },
+    {
+      "source": "docs/user/repository-tasks.md",
+      "route": "/docs/user/repository-tasks",
+      "title": "Repository investigations and releases",
+      "sha256": "2e4cbcb1f5aff9494fb37dff5a379745f46b07445e02a1756bf0b4dbb1c83205",
+      "modified": false
+    },
+    {
+      "source": "docs/user/review-bot.md",
+      "route": "/docs/user/review-bot",
+      "title": "Automatic code review with Review Bot",
+      "sha256": "389d2fc6825ac0de79c2dc41432971217e345da6ae02837632c9e6daf194f24f",
+      "modified": false
+    },
+    {
+      "source": "docs/user/search-console.md",
+      "route": "/docs/user/search-console",
+      "title": "Search Console",
+      "sha256": "3b0ba731641b17b1203ccd2eed0f680e092ef85755044d3ea349f499874ae692",
+      "modified": false
+    },
+    {
+      "source": "docs/user/skills.md",
+      "route": "/docs/user/skills",
+      "title": "Skills",
+      "sha256": "1510c50c6ccff6625e2652a677c7b25369953d9316c8a2de939cb4739b219170",
+      "modified": false
+    },
+    {
+      "source": "docs/user/telegram-experience.md",
+      "route": "/docs/user/telegram-experience",
+      "title": "Telegram usage",
+      "sha256": "272ea4f2a9fa048bee4a37020810fd23df7e73cbc823ea537e81b9afbc64c846",
+      "modified": false
+    },
+    {
+      "source": "docs/user/troubleshooting.md",
+      "route": "/docs/user/troubleshooting",
+      "title": "常见问题与排障",
+      "sha256": "90877fa0583d7a21207a6a5ac51fbbd8b775e0a1f24c7b79921df4f0576479c2",
+      "modified": false
+    },
+    {
+      "source": "docs/user/widgets.md",
+      "route": "/docs/user/widgets",
+      "title": "Interactive Telegram widgets",
+      "sha256": "1a89be069aef0fd2f62722893f9ab1906e8abdb2210122ed091a5b1f4b7fbac1",
+      "modified": false
+    },
+    {
+      "source": "docs/user/workflows.md",
+      "route": "/docs/user/workflows",
+      "title": "定时任务与报告",
+      "sha256": "973fdea0b76daf073a6b401d43cbed8a8e1eb10788ec925655a95f8b42fde1b4",
+      "modified": false
+    }
+  ]
+}

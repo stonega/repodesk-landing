@@ -12,8 +12,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const checkout = resolve(process.argv[2] ?? join(root, "../repodesk"));
-const manifestPath = join(root, "src/content/repodesk/manifest.json");
+const checkout = resolve(process.argv[2] ?? join(root, "../telo"));
+const manifestPath = join(root, "src/content/telo/manifest.json");
+const legacyManifestPath = join(root, "src/content/repodesk/manifest.json");
 const git = (...args: string[]) =>
   execFileSync("git", ["-C", checkout, ...args], { stdio: "pipe" });
 const revision = git("rev-parse", "HEAD").toString().trim();
@@ -47,9 +48,10 @@ const documents = sources.map((source) => {
   };
 });
 
-if (existsSync(manifestPath)) {
+for (const existingManifest of [manifestPath, legacyManifestPath]) {
+  if (!existsSync(existingManifest)) continue;
   const previous: { documents: { source: string }[] } = JSON.parse(
-    readFileSync(manifestPath, "utf8"),
+    readFileSync(existingManifest, "utf8"),
   );
   for (const { source } of previous.documents) {
     if (
@@ -69,7 +71,7 @@ for (const source of sources) {
 mkdirSync(dirname(manifestPath), { recursive: true });
 writeFileSync(
   manifestPath,
-  `${JSON.stringify({ repository: "https://github.com/stonega/repodesk", revision, documents }, null, 2)}\n`,
+  `${JSON.stringify({ repository: "https://github.com/stonega/telo", revision, documents }, null, 2)}\n`,
 );
 console.log(
   `Synced ${documents.length} user guides from ${checkout} at ${revision}.`,
