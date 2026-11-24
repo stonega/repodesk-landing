@@ -17,7 +17,7 @@ if (!index) throw new Error("Missing documentation index");
 
 describe("user documentation snapshot", () => {
   test("includes only user guides with verified hashes and unique static routes", () => {
-    expect(docsSnapshot.repository).toBe("https://github.com/stonega/repodesk");
+    expect(docsSnapshot.repository).toBe("https://github.com/stonega/telo");
     expect(docsSnapshot.revision).toMatch(/^[a-f0-9]{40}$/);
     const files = readdirSync(new URL("docs/user/", directory), {
       recursive: true,
@@ -36,8 +36,8 @@ describe("user documentation snapshot", () => {
       expect(createHash("sha256").update(content).digest("hex")).toBe(
         document.sha256,
       );
-      expect(content.toString("utf8").startsWith(`# ${document.title}\n`)).toBe(
-        true,
+      expect(content.toString("utf8").match(/^# (.+)$/m)?.[1]).toBe(
+        document.title,
       );
       expect(document.route).toMatch(/^\/docs(?:\/[a-z0-9-]+)*$/);
       expect(findDocument(`${document.route}/`)).toEqual(document);
@@ -52,7 +52,7 @@ describe("user documentation snapshot", () => {
   test("serves the user index and keeps navigation within the user guides", () => {
     const content = readFileSync(new URL(index.source, directory), "utf8");
     const links = Array.from(content.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g));
-    expect(links.length).toBeGreaterThan(15);
+    expect(links.length).toBeGreaterThan(25);
     for (const [, href] of links) {
       const route = resolveDocumentUrl(href, index.source);
       expect(findDocument(route)).toBeDefined();
@@ -97,7 +97,7 @@ describe("documentation destinations and Markdown rendering", () => {
     expect(resolveDocumentUrl("", source)).toBe("");
     expect(
       resolveDocumentUrl(
-        "https://github.com/stonega/repodesk/blob/main/docs/user/README.md#evidence-vocabulary",
+        "https://github.com/stonega/telo/blob/main/docs/user/README.md#evidence-vocabulary",
         source,
       ),
     ).toBe("/docs#evidence-vocabulary");
@@ -116,14 +116,14 @@ describe("documentation destinations and Markdown rendering", () => {
       ),
     ).toBe(`${root}/docs/research/data/sandbox-vps-2026-10-17.json`);
     expect(
-      resolveDocumentUrl("../../web/assets/repodesk-mark.svg", source, true),
+      resolveDocumentUrl("../../web/assets/telo-mark.svg", source, true),
     ).toBe(
-      `https://raw.githubusercontent.com/stonega/repodesk/${docsSnapshot.revision}/web/assets/repodesk-mark.svg`,
+      `https://raw.githubusercontent.com/stonega/telo/${docsSnapshot.revision}/web/assets/telo-mark.svg`,
     );
     for (const href of [
       "https://example.com/docs?q=a#b",
       "mailto:hello@example.com",
-      "https://github.com/stonega/repodesk/blob/another-version/docs/user/README.md",
+      "https://github.com/stonega/telo/blob/another-version/docs/user/README.md",
     ]) {
       expect(resolveDocumentUrl(href, source)).toBe(href);
     }

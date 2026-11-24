@@ -1,6 +1,6 @@
 # Get started：快速开始
 
-这篇教程使用 Docker Compose 部署 RepoDesk，通过 Telegram polling 收取消息。完成后，你可以登录管理面板，并在 Telegram 私聊机器人。无需域名、HTTPS 或公开端口。
+这篇教程使用 Docker Compose 部署 Telo，通过 Telegram polling 收取消息。完成后，你可以登录管理面板，并在 Telegram 私聊机器人。无需域名、HTTPS 或公开端口。
 
 如果只是加入已有团队，阅读 [Telegram 使用指南](telegram-experience.md)。
 
@@ -19,8 +19,8 @@
 以下命令用于全新安装。如果目录已有数据，保留原 `.env` 和 `secrets/`，按 [维护指南](maintenance.md) 操作。
 
 ```sh
-git clone https://github.com/stonega/repodesk.git
-cd repodesk
+git clone https://github.com/stonega/telo.git
+cd telo
 cp .env.example .env
 chmod 600 .env
 mkdir -p secrets
@@ -60,7 +60,7 @@ docker compose ps
 curl --fail http://localhost:3000/readyz
 ```
 
-首次构建需要下载依赖。`migrate` 完成后退出是正常现象；`postgres`、`app` 和 `worker` 应持续运行。`/readyz` 还会检查 worker 就绪状态，启动后可稍等再试。
+首次构建需要下载依赖。`migrate` 和 `code-truth-token` 完成后退出是正常现象；`postgres`、`code-truth`、`app` 和 `worker` 应持续运行。Code Truth 的内部连接与令牌会自动配置，工作区启用插件后才会索引仓库。`/readyz` 还会检查 worker 就绪状态，启动后可稍等再试。
 
 默认只在宿主机 `127.0.0.1:3000` 提供面板，数据库没有公开端口。命令细节可参阅 [Docker Compose 官方文档](https://docs.docker.com/reference/cli/docker/compose/)。
 
@@ -88,7 +88,7 @@ ssh -L 3000:127.0.0.1:3000 YOUR_USER@YOUR_SERVER
 
 面板管理员账号与 Telegram 身份分开管理。
 
-1. 在面板打开 **Members & access**，复制当前显示的邀请链接。
+1. Open **Groups & Members → Members → New** and copy the invite link.
 2. 用自己的 Telegram 账号打开链接并发送 Start。此类邀请由首个使用者领取，加入为普通成员；给另一位成员邀请时复制新的链接。
 3. 私聊机器人发送 `/help`，再发送“你好，介绍一下你能帮我做什么”。
 

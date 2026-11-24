@@ -15,6 +15,37 @@ docker compose logs --tail=100 app worker
 
 检查日志时间和面板当前状态，历史错误不代表问题仍在。分享诊断时提供版本、时间、任务引用和脱敏错误信息，不提供 `.env`、Token、密码或完整私聊内容。
 
+## Model provider saves return HTML or gateway errors
+
+Model discovery sends the provider API key as `Authorization: Bearer <API key>`
+to the inference base URL's `/models` endpoint. An API base URL ending in `/v1/`
+is accepted. A provider response containing HTML instead of a JSON model list
+produces a model-list error; check the endpoint and any proxy or sign-in page.
+
+An HTML 502/503/504 response while saving a model provider appears as a failed
+model-fetch error with its HTTP status and guidance to check the API base URL and
+network access from the Telo server. Check the app, database and reverse
+proxy using the health checks above. The dialog keeps its draft and unlocks its
+controls after failure. Check the saved provider before retrying if the request's
+outcome is uncertain. A browser JSON parser message alone does not establish that
+the provider rejected the API key.
+
+If model discovery works on your workstation but fails from the VPS, test
+connectivity from both the VPS host and the running app container. Node
+`UND_ERR_CONNECT_TIMEOUT` means the server could not establish the provider
+connection before receiving an HTTP response. Compare DNS answers and reachability
+to other services. A healthy Telo process does not prove provider connectivity.
+Resolve routing or provider-side access restrictions, use a reachable API endpoint,
+or configure an approved outbound proxy before retrying. Workstation proxy settings
+are not automatically available to the VPS app.
+
+New API pricing is requested separately from the same server's public
+`/api/pricing` endpoint without the inference key. If anonymous pricing returns
+401/403, HTML or another failure, model discovery can still succeed; prices stay
+unavailable and the saved provider shows a pricing warning. Missing token prices
+count as zero in application budgets and usage totals. Enter manual price overrides
+to include those costs in the estimates.
+
 ## 机器人不回复
 
 | 现象 | 检查与处理 |
@@ -44,7 +75,12 @@ polling 不会自动删除 webhook。更换传输方式后同时重新创建 app
 
 **预算不足或价格缺失**：检查单次/月度上限、模型价格和未确认费用。有限预算需要价格；留空预算是不设限，`0` 仅允许零费用调用。先向供应商核对账单，再由管理员处理未知费用。
 
-**超时**：普通运行默认 300 秒。检查模型延迟或推理设置；必要时调整 `RUN_TIMEOUT_SECONDS`，重新创建服务。调整不会自动重试旧失败，也不会延长 Codex 的任务授权范围。
+**Long-running requests:** Ordinary assistant runs have no total execution-time
+limit. Use `/status` to inspect progress and `/cancel` to stop work. Provider or
+individual tool requests can still fail. Historical `run_timeout` failures came
+from an older release and are not automatically retried after an update;
+`RUN_TIMEOUT_SECONDS` is now ignored. Reconcile unknown provider usage before
+requesting the work again.
 
 **图片或文件无法处理**：核对 [格式与大小限制](telegram-experience.md)，图片需视觉模型。扫描 PDF 可改发图片；不支持的文档可转成 UTF-8 文本，不发送秘密信息。
 
@@ -74,6 +110,12 @@ polling 不会自动删除 webhook。更换传输方式后同时重新创建 app
 
 登录暂停由管理员在 Codex 页面重新认证。任务默认分支不存在时，在 GitHub 修正；错误仓库不要靠改默认分支解决。取消的历史任务不会仅因权限恢复就自动重启。
 
+**仓库目标无法验证**：这可能是助手传入的仓库名称与原始请求不一致，不代表 GitHub 连接故障。明确原始请求中的目标仓库；等待或重新连接无法修复名称校验错误。
+
+**Codex 报告 sandbox 无法启动**：模型可能已正常回复，但读取源码的命令被执行环境阻止。管理员应检查 runner 与任务镜像版本；普通任务使用兼容容器的只读隔离，PR 审查的额外凭据保护仍要求执行环境支持。修复环境后查看原任务状态，再决定是否继续；不要据此修改 GitHub 权限。
+
+服务器重新启动后，服务恢复和任务恢复是两个步骤。新版本创建的开发任务会在确认基础设施中断后显示恢复状态，验证当前权限、保留工作区并继续检查。管理员可查看原任务状态；无需为等待恢复重复提交请求。权限撤销、保留期届满或无法确认启动结果会阻止续跑，发布结果未知仍需先核对 GitHub。
+
 Review Bot 额外检查 HTTPS webhook、secret、事件订阅和 GitHub delivery。自动审查跳过草稿 PR；明确请求的修复需启用并满足写权限，fork PR 仅支持审查和问答。
 
 **View conversation** 打不开时，检查 BotFather Main Mini App 的 `/mini` URL，从 Telegram 重新打开以刷新身份。私聊记录只向原发起人开放，群记录还需当前群成员和来源权限；过期来源或旧任务也可能限制可见内容。
@@ -87,3 +129,15 @@ Review Bot 额外检查 HTTPS webhook、secret、事件订阅和 GitHub delivery
 ## 升级或恢复后异常
 
 检查磁盘、迁移结果、镜像版本一致性、Compose 项目名以及是否沿用原密钥和数据卷。不要重新生成密钥、删除卷或直接回退数据库。按 [备份与恢复](maintenance.md) 核对后再恢复写入。
+
+
+## “Message thread not found” in a private Topic
+
+Telegram can reject replies to a private Topic even when a request reaches the bot.
+Ask your host operator to check the run's delivery error separately from model
+execution. If you request it, the operator can enable recovery of ordinary answers
+in your main private chat. Look in the bot's **All messages** view. Recovery uses standard text delivery and
+explains why the answer appears there. The native Topic can remain unavailable.
+This setting applies only to your current workspace and bot. It does not recover
+messages Telegram never delivered to the bot. Group replies, buttons and uncertain
+sends stay excluded. Ask the operator to disable recovery when it is no longer needed.

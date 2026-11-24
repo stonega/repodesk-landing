@@ -1,4 +1,4 @@
-import snapshot from "../content/repodesk/manifest.json" with { type: "json" };
+import snapshot from "../content/telo/manifest.json" with { type: "json" };
 
 export const docsSnapshot = snapshot;
 export type Doc = (typeof snapshot.documents)[number];
@@ -19,7 +19,7 @@ export function resolveDocumentUrl(
   image = false,
 ) {
   if (!href || href.startsWith("#")) return href;
-  const base = "https://repodesk-source.invalid/";
+  const base = "https://telo-source.invalid/";
   const url = new URL(href, `${base}${source}`);
   let path: string;
   if (url.origin === new URL(base).origin) {
@@ -35,7 +35,7 @@ export function resolveDocumentUrl(
   const document = snapshot.documents.find((entry) => entry.source === path);
   if (document && !image) return document.route + url.search + url.hash;
   const root = image
-    ? `https://raw.githubusercontent.com/stonega/repodesk/${snapshot.revision}`
+    ? `https://raw.githubusercontent.com/stonega/telo/${snapshot.revision}`
     : `${snapshot.repository}/blob/${snapshot.revision}`;
   return `${root}/${path}${url.search}${url.hash}`;
 }

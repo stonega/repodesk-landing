@@ -1,6 +1,6 @@
 # 模型与配置
 
-RepoDesk 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型。供应商由部署管理员统一添加，各工作区保存自己的选择。
+Telo 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型。供应商由部署管理员统一添加，各工作区保存自己的选择。
 
 ## 添加模型供应商
 
@@ -25,6 +25,29 @@ RepoDesk 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型�
 
 首次配置后用小请求验证。ChatGPT 登录与模型 API Key 是两种独立认证方式，不会授予 GitHub 权限。
 
+## 聊天网页搜索
+
+在 **Model settings → Search providers** 查看搜索供应商：
+
+- **DuckDuckGo (free)**：内置免费预设，无需添加或填写 API Key，直接在聊天模型中选择即可。预设不能编辑或删除。使用公开搜索结果页，可能遇到限流或验证而暂时不可用。
+- **DeepSeek**：点击 **New**，填写 DeepSeek API Key，使用官方 Search API。
+- **Exa**：点击 **New**，填写 Exa API Key。
+
+供应商可供同一部署管理员的工作区复用；Key 加密保存且不会回显。
+编辑同一类型的供应商时，Key 留空保留原值；切换到另一种付费类型需要重新填写。
+保存凭据不会发起搜索，也不验证余额或配额。
+
+在 **Bot chat model → Edit → Search provider** 选择 DuckDuckGo 预设或已添加的供应商，
+或选择 **Disabled** 关闭搜索。保存后，聊天模型可按需要调用 `search_tool`
+查询公开网页，并引用结果链接。首次配置默认关闭，Codex 和 Review Bot 不受此选项影响。
+每次搜索最多返回 10 条带标题、链接和摘要的结果，查询最长 128 个字符。
+搜索结果是外部参考资料，不会授予操作权限；不要把密钥或私密对话交给搜索供应商。
+
+DeepSeek、Exa 的搜索请求费用由供应商单独计费，不计入模型 token 预算或 Usage 金额。
+替换供应商凭据或更改聊天模型设置会使使用旧配置的运行停止。
+删除正在使用的供应商前，先在各工作区切换供应商或关闭搜索。
+已有的自定义 DuckDuckGo 记录及其选择继续生效；切换到内置预设后，可删除不再使用的旧记录。
+
 ## 推理强度、容量和价格
 
 聊天模型的 **Advanced model settings** 提供推理强度、上下文和最大输出容量、输入输出及缓存价格覆盖。
@@ -33,11 +56,13 @@ RepoDesk 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型�
 
 容量和价格可能来自供应商或内置目录，界面区分自动信息与手动覆盖。代理和自定义模型的实际限制可能不同，以供应商说明为准。清空上下文容量覆盖后，由供应商执行限制。
 
-价格用于应用内估算，不等同于供应商账单。缺少价格的模型可以在无限预算下记录 token；有限预算要求有可用价格。填写 `0` 表示明确的零价格。
+Prices provide application cost estimates. Missing token prices count as zero
+for budgets and usage accounting. Available rates continue to apply independently,
+and token counts remain recorded for models with finite or unlimited budgets.
 
 ## 工作区预算与保留
 
-在 **Overview** 的工作区编辑器调整时区、保留期限、单次和月度 USD 预算。
+在 **Settings** 的团队配置编辑器调整工作区名称、时区、保留期限、单次和月度 USD 预算。
 
 - 预算留空为 **None**，表示不设金额上限；`0` 仅允许零费用请求。
 - 未确认费用继续占用预留预算，直到管理员核对。
@@ -47,6 +72,9 @@ RepoDesk 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型�
 普通聊天费用、Codex 供应商费用和 ChatGPT 账号限制分别管理。不要把聊天费用总额当作全部外部服务账单。
 
 ## 查看用量
+
+Historical unpriced calls without reconciled charges count as zero in usage totals
+and remaining budgets.
 
 面板 **Usage** 展示用量和预留费用，Telegram 的 `/usage` 提供摘要。也可以在私聊询问“本月我的模型费用是多少？”或“把今天的费用按模型拆分”。
 
@@ -65,13 +93,16 @@ RepoDesk 的聊天、Codex 开发和 Review Bot 审查可以选择不同模型�
 | `APP_PORT` | `3000`，宿主机回环监听端口 |
 | `ENCRYPTION_KEY_FILE` | `./secrets/encryption-key`，Compose 使用的加密密钥文件 |
 | `TELEGRAM_TRANSPORT` | `webhook`；快速开始使用 `polling` |
-| `RUN_TIMEOUT_SECONDS` | `300`，普通助手单次时限，范围 `1–1800` 秒 |
 | `COMPOSE_FILE` | 基础文件和可选服务叠加文件 |
 | `CODEX_RUNNER_CONCURRENCY` | `4`，runner 并发任务数，范围 `1–32` |
 | `CODEX_RUNNER_CPUS` | `2`，Codex 任务 CPU 设置 |
 | `CODEX_RUNNER_MEMORY_MB` | `4096`，Codex 任务内存设置 |
 | `CODEX_RUNNER_RETENTION_HOURS` | `24`，runner 工作数据保留设置 |
 
-修改 `.env` 后使用 `docker compose up -d` 重新创建受影响服务；单纯 `restart` 不会加载新的容器环境。`RUN_TIMEOUT_SECONDS` 不是 Codex 持续任务的总时长上限。
+After changing `.env`, recreate affected services with `docker compose up -d`;
+`restart` does not load new container environment values. Ordinary assistant runs
+have no total execution-time limit. The retired `RUN_TIMEOUT_SECONDS` variable is
+ignored. Cancellation, permissions, configured spending budgets and upstream
+service limits still apply.
 
 完整配置见 [Code Truth](code-truth.md)、[Codex](codex.md) 和 [维护指南](maintenance.md)。

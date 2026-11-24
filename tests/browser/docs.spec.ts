@@ -14,11 +14,11 @@ test("landing Docs and setup links open local documentation; Back returns home",
     .click();
   await expect(page).toHaveURL(/\/docs$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "RepoDesk 用户文档",
+    "Telo 用户文档",
   );
   await page.goBack();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Good work starts",
+    "Your warm AI work buddy",
   );
   await page.getByRole("link", { name: "Get started", exact: true }).click();
   await expect(page).toHaveURL(/\/docs\/user\/get-started$/);
@@ -34,7 +34,7 @@ test("index preserves original documents, links, section IDs and source attribut
   page.on("pageerror", (error) => errors.push(error.message));
   const response = await page.goto("/docs");
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle("RepoDesk 用户文档 — RepoDesk Docs");
+  await expect(page).toHaveTitle("Telo 用户文档 — Telo Docs");
   const article = page.getByRole("article");
   await expect(article.getByRole("table").first()).toBeVisible();
   await expect(
@@ -76,7 +76,7 @@ test("deep pages prerender useful content without JavaScript", async ({
   });
   const page = await context.newPage();
   for (const [path, title] of [
-    ["/docs", "RepoDesk 用户文档"],
+    ["/docs", "Telo 用户文档"],
     ["/docs/user/get-started", "Get started：快速开始"],
     ["/docs/user/codex", "Codex 开发任务"],
     ["/docs/user/troubleshooting", "常见问题与排障"],
@@ -116,7 +116,7 @@ test("documentation navigation and skip link work with keyboard focus", async ({
     await page.keyboard.press("Tab");
     await expect(
       disclosure.getByRole("link", {
-        name: "RepoDesk 用户文档",
+        name: "Telo 用户文档",
         exact: true,
       }),
     ).toBeFocused();
@@ -138,7 +138,7 @@ test("documentation navigation and skip link work with keyboard focus", async ({
       "Get started：快速开始",
     );
     await navigation
-      .getByRole("link", { name: "RepoDesk 用户文档", exact: true })
+      .getByRole("link", { name: "Telo 用户文档", exact: true })
       .focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/docs$/);

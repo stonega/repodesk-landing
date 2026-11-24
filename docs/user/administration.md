@@ -15,7 +15,7 @@
 
 ## 邀请成员
 
-1. 打开 **Members & access**，复制当前邀请链接。
+1. Open **Groups & Members → Members → New** and copy the link in **Add member**.
 2. 私下交给预定成员，对方用自己的 Telegram 账号打开并发送 Start。
 3. 确认成员列表出现其身份，再使用新链接邀请下一人。
 
@@ -23,7 +23,7 @@
 
 ### 处理访问申请
 
-未获准用户可以发消息并点击 **Request access**。在 **Members & access → Access requests** 审核：
+未获准用户可以发消息并点击 **Request access**。在 **Groups & Members → Access requests** 审核：
 
 - **Approve access**：加入或恢复普通成员身份。
 - **Reject request**：不授予访问；对方可在 24 小时后重新申请。
@@ -32,7 +32,7 @@
 
 ## 手动管理成员
 
-Add/Edit 对话框管理角色和活跃状态。身份以 Telegram 数字用户 ID 为准，显示名和用户名仅供识别。停用会阻止其继续执行机器人工作，已有远端结果不会撤回。
+Use the member row’s **Edit** dialog to manage its role, active membership and GitHub account. **New** opens the invite dialog.身份以 Telegram 数字用户 ID 为准，显示名和用户名仅供识别。停用会阻止其继续执行机器人工作，已有远端结果不会撤回。
 
 管理员可以关联成员的 GitHub 资料，但此时显示 **Verification pending**。只有本人在私聊完成 `/github` 授权并返回确认后，才是已验证连接。当前 GitHub 写权限是执行 Codex 的必要条件，管理员角色不能替代。
 
@@ -42,14 +42,40 @@ Add/Edit 对话框管理角色和活跃状态。身份以 Telegram 数字用户 
 
 | 页面 | 主要用途 |
 | --- | --- |
-| Overview | 工作区摘要、时区、预算和保留期限 |
-| Settings | 活动状态和暂停/恢复 |
-| Members & access | 成员、GitHub 关联和访问申请 |
-| Group access | 群组绑定、可见性和消息收集 |
+| Overview | 工作区摘要和已连接服务（Telegram 机器人、GitHub App） |
+| Settings | 团队配置（工作区名称、时区、预算和保留期限）、Team currency、活动状态与暂停/恢复 |
+| Groups & Members | Workspace members, GitHub accounts, access requests and Telegram group management |
 | Plugins / Skills / Workflows / Instructions | 集成、技能、定时工作和持久指令 |
 | Runs & delivery / Usage / Audit / Privacy | 运行、交付、费用、审计和删除 |
 
 可见入口取决于权限。多人同时修改时，旧页面保存可能失败；重新加载并核对新值后再保存。
+
+## Team currency
+
+Open **Settings → Team currency → Edit**, choose USD, CNY, TWD, HKD, EUR,
+GBP, JPY or SGD, then save. New and existing workspaces default to USD.
+The assistant uses this as its preferred currency when the request and sources
+do not specify one. Explicit source currencies remain unchanged. Budgets, model
+costs and usage accounting use USD; this setting does not convert amounts or
+fetch exchange rates. Model-price override currency is configured separately.
+
+Cancel discards changes. A failed save retains your selection; if someone else
+changed settings, reload the current version and review it before saving again.
+
+## 管理员自检助手
+
+选择工作区后，点击面板右下角的聊天按钮，打开 **Self-check assistant**。
+点击 **Run self-check** 或输入问题，查看当前工作区的配置、worker 心跳、
+Telegram 接收状态、模型、成员、技能和近期失败请求。展开 **View findings**
+可查看各项结果及相关设置入口。
+
+助手只读检查并解释问题，不会修改配置、发送 Telegram 消息或执行修复。
+已保存的连接配置不代表外部服务已通过实时验证；实时权限或网络问题仍需核对。
+没有配置聊天模型时仍能查看基本检查；配置后可继续对话，模型调用计入工作区预算。
+不要在对话中输入密码、API key 或其他凭据。
+
+关闭弹窗会保留本页对话，切换工作区、退出或刷新页面会清空。工作区暂停时仍可
+使用自检来排查问题；它不会恢复已取消的任务。
 
 ## 暂停与恢复
 

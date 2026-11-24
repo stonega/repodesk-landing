@@ -7,10 +7,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#f5f5ef" />
+        <meta name="theme-color" content="#faf7f2" />
         <Meta />
         <Links />
-        <link rel="icon" href="/repodesk-mark.svg" type="image/svg+xml" />
+        <link rel="icon" href="/telo-mark.svg" type="image/svg+xml" />
       </head>
       <body>
         {children}
@@ -20,6 +20,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+
 export default function App() {
   return <Outlet />;
 }

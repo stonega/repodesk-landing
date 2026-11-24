@@ -12,14 +12,14 @@ describe("illustrative workflow diagram", () => {
       "GITHUB",
       "web-app",
       "api-service",
-      "RepoDesk",
+      "Telo",
       "Telegram",
       "example conversation",
       "Example repositories and messages, not live activity.",
     ]) {
       expect(html).toContain(label);
     }
-    expect(html).toContain('src="/repodesk-mark.svg"');
+    expect(html).toContain('src="/telo-mark.svg"');
     expect(html).not.toContain("<a ");
     expect(html).not.toContain("<form");
   });

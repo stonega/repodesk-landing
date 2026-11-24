@@ -71,8 +71,8 @@ export default function Walkthrough() {
     <div className="conversation-scene">
       <div className="scene-doodle" aria-hidden="true">
         <svg
-          width="76"
-          height="52"
+          width="74"
+          height="46"
           viewBox="0 0 76 52"
           aria-hidden="true"
           focusable="false"
@@ -86,7 +86,7 @@ export default function Walkthrough() {
             strokeLinejoin="round"
           />
         </svg>
-        <span>A little message. A next step.</span>
+        <span>A quick message. A clear next step.</span>
       </div>
       <div className="scene-label">
         <span>THREE WAYS TO START</span>
@@ -94,21 +94,21 @@ export default function Walkthrough() {
       </div>
       <div className="chat-window">
         <div className="chat-header">
-          <img src="/repodesk-mark.svg" width="38" height="38" alt="" />
+          <img src="/telo-mark.svg" width="40" height="40" alt="" />
           <div>
-            <strong>RepoDesk</strong>
-            <span>Telegram · repository assistant</span>
+            <strong>Telo</strong>
+            <span>Telegram · workspace assistant</span>
           </div>
-          <span className="bot-label">BOT</span>
+          <span className="bot-label">EXPLICIT APPROVAL</span>
         </div>
         <div className="repository-context">
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.5"
+            strokeWidth="1.7"
             aria-hidden="true"
           >
             <circle cx="6" cy="5" r="3" />

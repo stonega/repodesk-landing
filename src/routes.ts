@@ -1,5 +1,5 @@
 import { index, type RouteConfig, route } from "@react-router/dev/routes";
-import snapshot from "./content/repodesk/manifest.json" with { type: "json" };
+import snapshot from "./content/telo/manifest.json" with { type: "json" };
 
 export default [
   index("routes/home.tsx"),

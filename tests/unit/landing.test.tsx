@@ -23,19 +23,28 @@ describe("public landing page contract", () => {
     expect(link).toContain("M12 .297C5.37.297");
     expect(link).not.toContain('stroke="currentColor"');
   });
-  test("offers setup and source destinations without collecting visitor data", () => {
+
+  test("offers Telo setup, docs, and source destinations without collecting visitor data", () => {
     const html = renderToStaticMarkup(<Home />);
+    expect(html).toContain('src="/telo-mark.svg"');
+    expect(html).toContain("Telo");
     expect(html).toContain(`href="${DOCS_URL}"`);
     expect(html).toContain(`href="${REPO_URL}"`);
+    expect(html).toContain('href="/docs/user/code-truth"');
+    expect(html).toContain('href="/docs/user/codex"');
+    expect(html).toContain('href="/docs/user/review-bot"');
+    expect(html).toContain('href="/docs/user/agent-orchestration"');
     expect(html).not.toContain("<form");
     expect(html).not.toContain("<iframe");
   });
+
   test("distinguishes demonstration content from a real task result", () => {
     const html = renderToStaticMarkup(<Home />);
     expect(html).toContain("ILLUSTRATIVE CONVERSATION");
     expect(html).toContain("EXAMPLE PULL REQUEST");
     expect(html).toContain("Merging is a separate action");
   });
+
   test("ships useful document metadata and native disclosures", () => {
     expect(meta()).toContainEqual(
       expect.objectContaining({ name: "description" }),
@@ -45,6 +54,7 @@ describe("public landing page contract", () => {
     expect(html.match(/<details>/g)).toHaveLength(4);
     expect(html).toContain('href="#main"');
   });
+
   test("pairs each workflow step with a local, decorative illustration", () => {
     const html = renderToStaticMarkup(<Home />);
     const stories = ["connect", "conversation", "review"];
